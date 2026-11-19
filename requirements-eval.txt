@@ -1,0 +1,5 @@
+# RAGAS evaluation. Kept out of requirements.txt so the Vercel bundle stays small;
+# the /evaluate endpoint returns 501 where these are not installed.
+# ragas 0.4.3 still imports a module removed in langchain-community 0.4.2.
+ragas==0.4.3
+langchain-community==0.4.1

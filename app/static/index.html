@@ -1,0 +1,784 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brand Q&amp;A Agent</title>
+<style>
+  :root {
+    --bg: #f6f6f4; --card: #ffffff; --text: #1d1d1b; --muted: #6b6b66; --line: #deded9;
+    --accent: #2f5fd0; --accent-text: #ffffff; --good: #1f7a4d; --bad: #b3372f; --soft: #f0f0ec;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #161615; --card: #20201e; --text: #ececE6; --muted: #a0a09a; --line: #363633;
+      --accent: #7ea2f2; --accent-text: #10131a; --good: #5fc592; --bad: #ef8a80; --soft: #2a2a27;
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; }
+  header { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  h1 { font-size: 22px; margin: 0; }
+  h2 { font-size: 15px; margin: 0 0 12px; }
+  h3 { font-size: 12px; margin: 16px 0 6px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+  label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+  input, textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--card); color: var(--text); font: inherit; }
+  textarea { min-height: 96px; resize: vertical; }
+  .field { margin-bottom: 12px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+  button { padding: 8px 14px; border: 1px solid var(--line); border-radius: 6px; background: var(--soft); color: var(--text); font: inherit; cursor: pointer; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+  button:disabled { opacity: .55; cursor: wait; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+  .tabs button[aria-selected="true"] { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+  .status { margin-top: 12px; font-size: 14px; color: var(--muted); min-height: 1.5em; }
+  .status.good { color: var(--good); }
+  .status.bad { color: var(--bad); }
+  .examples { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .examples button { font-size: 13px; padding: 4px 10px; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 13px; font-weight: 600; border: 1px solid currentColor; }
+  .badge.good { color: var(--good); }
+  .badge.bad { color: var(--bad); }
+  .answer { white-space: pre-wrap; margin: 10px 0 0; font-size: 16px; }
+  .citation { border-top: 1px solid var(--line); padding: 10px 0; }
+  .citation a { color: var(--accent); word-break: break-all; }
+  .citation p { margin: 6px 0 0; font-size: 13px; color: var(--muted); white-space: pre-wrap; max-height: 130px; overflow: auto; }
+  ol.trace { margin: 0; padding-left: 22px; font-size: 14px; }
+  ol.trace b { font-weight: 600; }
+  ol.trace:empty::before { content: "Ask a question to see the trace."; margin-left: -22px; color: var(--muted); }
+  #health-text { font-size: 13px; color: var(--muted); }
+  .section-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .section-head h2 { margin: 0; }
+  details { border-top: 1px solid var(--line); padding: 8px 0; }
+  summary { cursor: pointer; font-size: 14px; word-break: break-all; }
+  .chunk { margin: 8px 0 0 16px; font-size: 13px; }
+  .chunk b { color: var(--muted); font-weight: 600; }
+  .chunk p { margin: 2px 0 0; white-space: pre-wrap; }
+  #logs { max-height: 340px; overflow: auto; background: var(--soft); border-radius: 6px; padding: 10px; font: 12px/1.6 ui-monospace, Menlo, monospace; }
+  .log-line { white-space: pre-wrap; word-break: break-word; }
+  .log-line.error { color: var(--bad); }
+  .log-time { color: var(--muted); }
+  .api-call { margin-top: 12px; padding: 10px; background: var(--soft); border-radius: 6px; font-size: 13px; }
+  .api-line { font: 12px/1.5 ui-monospace, Menlo, monospace; overflow-wrap: anywhere; }
+  .api-call h3 { margin: 10px 0 4px; }
+  .api-call pre { margin: 0; max-height: 240px; overflow: auto; padding: 8px; background: var(--card); border: 1px solid var(--line); border-radius: 6px; font: 12px/1.5 ui-monospace, Menlo, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .toggles { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 12px; }
+  .toggles label { display: flex; gap: 6px; align-items: center; margin: 0; font-size: 14px; color: var(--text); cursor: pointer; }
+  .toggles input { width: auto; }
+  select { padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--card); color: var(--text); font: inherit; max-width: 100%; }
+  .both { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+  .both-card { background: var(--soft); border-radius: 6px; padding: 12px; font-size: 14px; }
+  .both-card h4 { margin: 0 0 8px; font-size: 14px; }
+  .both-card p { margin: 8px 0; white-space: pre-wrap; }
+  .both-card small { color: var(--muted); display: block; overflow-wrap: anywhere; }
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { border-top: 1px solid var(--line); padding: 6px 8px; text-align: left; vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; }
+  td.rank-first { color: var(--good); font-weight: 600; }
+  td.rank-missed { color: var(--bad); font-weight: 600; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin: 12px 0; }
+  .tile { background: var(--soft); border-radius: 6px; padding: 10px; }
+  .tile b { display: block; font-size: 22px; }
+  .tile span { display: block; font-size: 12px; color: var(--muted); }
+  .tile.good b { color: var(--good); }
+  .tile.bad b { color: var(--bad); }
+  .eval-case { border-top: 1px solid var(--line); padding: 12px 0; }
+  .eval-case h4 { margin: 8px 0; font-size: 14px; }
+  .eval-case dl { margin: 0; display: grid; grid-template-columns: 90px 1fr; gap: 4px 8px; font-size: 13px; }
+  .eval-case dt { color: var(--muted); }
+  .eval-case dd { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+  [hidden] { display: none !important; }
+  @media (max-width: 520px) { .row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Brand Q&amp;A Agent</h1>
+    <div class="buttons" style="align-items:center">
+      <span id="health-text"></span>
+      <button id="health-button" type="button">Check health</button>
+    </div>
+  </header>
+  <div id="health-api"></div>
+
+  <section>
+    <div class="field" style="margin:0">
+      <label for="tenant">Tenant</label>
+      <input id="tenant" value="acme" pattern="[A-Za-z0-9_\-]{1,64}" autocomplete="off">
+    </div>
+  </section>
+
+  <section>
+    <h2>1. Ingest documents</h2>
+    <div class="tabs" role="tablist">
+      <button type="button" role="tab" data-tab="text" aria-selected="true">Text</button>
+      <button type="button" role="tab" data-tab="url" aria-selected="false">URL</button>
+      <button type="button" role="tab" data-tab="sample" aria-selected="false">Sample data</button>
+    </div>
+
+    <form id="ingest-form">
+      <div data-panel="text">
+        <div class="field">
+          <label for="doc-text">Text</label>
+          <textarea id="doc-text" placeholder="Paste any English text about a brand"></textarea>
+        </div>
+      </div>
+      <div data-panel="url" hidden>
+        <div class="field">
+          <label for="doc-urls">URLs, one per line</label>
+          <textarea id="doc-urls" placeholder="https://example.com/review"></textarea>
+        </div>
+      </div>
+      <div data-panel="text url">
+        <div class="field">
+          <label for="doc-brand">Brand</label>
+          <input id="doc-brand" placeholder="Nike" autocomplete="off">
+        </div>
+        <button class="primary" type="submit">Ingest</button>
+      </div>
+      <div data-panel="sample" hidden>
+        <div class="buttons">
+          <button class="sample" type="button" data-url="/retrieval-tests/catalogue_ingest.json">Small catalogue (28 made-up products)</button>
+          <button class="sample" type="button" data-file="ingest_simple.json">Simple notes (2 short documents)</button>
+          <button class="sample" type="button" data-file="ingest_mixed.json">Quick sample (2 articles)</button>
+          <button class="sample" type="button" data-file="ingest_urls.json">Full set by URL (12 documents)</button>
+          <button class="sample" type="button" data-file="ingest_text.json">Full set by text (12 documents)</button>
+        </div>
+      </div>
+    </form>
+    <div id="ingest-status" class="status" role="status"></div>
+    <div id="ingest-api"></div>
+  </section>
+
+  <section>
+    <h2>2. Ask a question</h2>
+    <div class="examples">
+      <button type="button">Which is cheaper, the Nike Pegasus 41 or the Asics Novablast 5?</button>
+      <button type="button">How do ASICS and Nike differ in fit?</button>
+      <button type="button">What is the capital of France?</button>
+      <button type="button">What is Nike's stock price today?</button>
+    </div>
+    <form id="ask-form">
+      <div class="field">
+        <label for="question">Question</label>
+        <textarea id="question" style="min-height:64px" placeholder="Type a question in plain English"></textarea>
+      </div>
+      <div class="toggles">
+        <label><input id="use-hybrid" type="checkbox"> Hybrid search</label>
+        <label><input id="use-rerank" type="checkbox"> Reranking</label>
+      </div>
+      <div class="buttons">
+        <button class="primary" type="submit">Ask</button>
+        <button id="ask-both" type="button">Ask both ways</button>
+      </div>
+    </form>
+    <div id="ask-status" class="status" role="status"></div>
+    <div id="ask-api"></div>
+  </section>
+
+  <section id="result" hidden aria-live="polite">
+    <h2>Answer</h2>
+    <span id="found" class="badge"></span>
+    <p id="answer" class="answer"></p>
+    <div id="citations-block">
+      <h3>Citations</h3>
+      <div id="citations"></div>
+    </div>
+  </section>
+
+  <section id="both-section" hidden>
+    <h2>Same question, both ways</h2>
+    <div id="both" class="both"></div>
+  </section>
+
+  <section>
+    <h2>Trace</h2>
+    <ol id="trace" class="trace"></ol>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Logs</h2>
+      <button id="clear-logs" type="button">Clear view</button>
+    </div>
+    <div id="logs" aria-live="off"></div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Stored chunks</h2>
+      <button id="load-chunks" type="button">Refresh chunks</button>
+    </div>
+    <div id="chunks-status" class="status" role="status" style="margin-top:0"></div>
+    <div id="chunks"></div>
+    <div id="chunks-api"></div>
+  </section>
+
+  <section>
+    <h2>RAGAS evaluation</h2>
+    <p style="margin:0 0 12px;font-size:14px;color:var(--muted)">
+      Tests this tenant against known questions from the 3 URLs: Tom's Guide, Runner's Picks and
+      Captain Creps. Ingest those first. The quick run covers each URL plus one off-topic question.
+      It uses many Gemini calls, so start there. Progress also appears in Logs above.
+    </p>
+    <div class="buttons">
+      <button class="eval-start" type="button" data-limit="4">Quick run (4 questions)</button>
+      <button class="eval-start" type="button" data-limit="">Full run (7 questions)</button>
+    </div>
+    <div id="eval-status" class="status" role="status"></div>
+    <div id="eval-tiles" class="tiles"></div>
+    <div id="eval-cases"></div>
+    <div id="eval-api"></div>
+    <div id="eval-result-api"></div>
+  </section>
+
+  <section>
+    <h2>Search mode comparison</h2>
+    <p style="margin:0 0 12px;font-size:14px;color:var(--muted)">
+      Measures where the correct chunk lands in each mode. #1 is best, and Missed means it never
+      reached the top 5. Ingest the matching data for this tenant first: the 3 URLs for the first
+      test, the full set for the 12 articles test, or Small catalogue for the control, where
+      semantic search alone already does well.
+    </p>
+    <div class="buttons">
+      <select id="compare-dataset" aria-label="Test dataset">
+        <option value="three_urls">Your 3 URLs (10 questions)</option>
+        <option value="shoes">All 12 articles (10 questions)</option>
+        <option value="catalogue">Small catalogue, control (15 questions)</option>
+      </select>
+      <button id="compare-run" class="primary" type="button">Run comparison</button>
+    </div>
+    <div id="compare-status" class="status" role="status"></div>
+    <div id="compare-tiles" class="tiles"></div>
+    <div id="compare-table" class="table-wrap"></div>
+    <div id="compare-api"></div>
+  </section>
+</main>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  let activeTab = "text";
+
+  function tenantPath(action) {
+    const tenant = $("tenant").value.trim();
+    if (!/^[A-Za-z0-9_-]{1,64}$/.test(tenant)) {
+      throw new Error("Tenant can only use letters, numbers, - and _.");
+    }
+    return `/tenants/${tenant}/${action}`;
+  }
+
+  function errorText(status, body) {
+    if (body && body.error === "llm_error" && /RateLimit/.test(body.detail)) {
+      return "Gemini rate limit reached. Wait about a minute and try again.";
+    }
+    if (body && typeof body.detail === "string") return body.detail;
+    if (body && Array.isArray(body.detail)) return body.detail.map((item) => item.msg).join("; ");
+    return `Request failed with status ${status}.`;
+  }
+
+  const MAX_BODY_CHARS = 5000;
+
+  function bodyBlock(title, body) {
+    const heading = document.createElement("h3");
+    heading.textContent = title;
+    const block = document.createElement("pre");
+    const text = JSON.stringify(body, null, 2) ?? "(none)";
+    const hidden = text.length - MAX_BODY_CHARS;
+    block.textContent = hidden > 0
+      ? `${text.slice(0, MAX_BODY_CHARS)}\n... ${hidden} more characters hidden`
+      : text;
+    return [heading, block];
+  }
+
+  // Shows the real call under its section. append keeps earlier calls, for Ask both ways.
+  function showApiCall(targetId, { method, path, request, status, response }, append = false) {
+    const call = document.createElement("div");
+    call.className = "api-call";
+    const line = document.createElement("div");
+    line.className = "api-line";
+    const ok = status >= 200 && status < 300;
+    const code = document.createElement("span");
+    code.className = `badge ${ok ? "good" : "bad"}`;
+    code.textContent = String(status);
+    line.append(`${method} ${location.origin}${path} `, code);
+    call.append(line);
+    if (request !== undefined) call.append(...bodyBlock("Request body", request));
+    call.append(...bodyBlock("Response body", response));
+    if (append) $(targetId).append(call);
+    else $(targetId).replaceChildren(call);
+  }
+
+  async function callApi(targetId, path, payload, append = false) {
+    const response = await fetch(path, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const body = await response.json().catch(() => null);
+    showApiCall(targetId, {
+      method: "POST", path, request: payload, status: response.status, response: body,
+    }, append);
+    if (!response.ok) throw new Error(errorText(response.status, body));
+    return body;
+  }
+
+  // Runs a request with buttons disabled and a live timer, because answers can take a while.
+  async function withProgress(statusElement, label, work) {
+    const buttons = document.querySelectorAll("form button, .examples button");
+    const started = Date.now();
+    const seconds = () => Math.round((Date.now() - started) / 1000);
+    statusElement.className = "status";
+    statusElement.textContent = `${label}... 0s`;
+    const timer = setInterval(() => {
+      statusElement.textContent = `${label}... ${seconds()}s`;
+      loadLogs();
+    }, 1000);
+    buttons.forEach((button) => { button.disabled = true; });
+    try {
+      const message = await work();
+      statusElement.className = "status good";
+      statusElement.textContent = `${message} (${seconds()}s)`;
+    } catch (error) {
+      statusElement.className = "status bad";
+      statusElement.textContent = error.message === "Failed to fetch"
+        ? "Could not reach the service. Is make run still running?"
+        : error.message;
+    } finally {
+      clearInterval(timer);
+      buttons.forEach((button) => { button.disabled = false; });
+      loadLogs();
+    }
+  }
+
+  let lastLogId = 0;
+  let loadingLogs = false;
+
+  function renderLog(entry) {
+    const line = document.createElement("div");
+    line.className = `log-line ${entry.level === "ERROR" ? "error" : ""}`;
+    const time = document.createElement("span");
+    time.className = "log-time";
+    time.textContent = `${new Date(entry.time).toLocaleTimeString()}  `;
+    line.append(time, entry.message);
+    return line;
+  }
+
+  async function loadLogs() {
+    if (loadingLogs) return;
+    loadingLogs = true;
+    const tenant = $("tenant").value.trim();
+    try {
+      const response = await fetch(`${tenantPath("logs")}?after=${lastLogId}`);
+      const { entries } = await response.json();
+      if (tenant !== $("tenant").value.trim() || !entries.length) return;
+      const box = $("logs");
+      box.append(...entries.map(renderLog));
+      box.scrollTop = box.scrollHeight;
+      lastLogId = entries[entries.length - 1].id;
+    } catch {
+      // Logs are a convenience, so a failed poll stays quiet and the next one retries.
+    } finally {
+      loadingLogs = false;
+    }
+  }
+
+  function renderDocumentChunks(source, chunks) {
+    const group = document.createElement("details");
+    group.open = true;
+    const summary = document.createElement("summary");
+    summary.textContent = `${source} (${chunks[0].brand}, ${chunks.length} chunks)`;
+    group.append(summary);
+    chunks.forEach((chunk) => {
+      const block = document.createElement("div");
+      block.className = "chunk";
+      const label = document.createElement("b");
+      label.textContent = `Chunk ${chunk.chunk_index}`;
+      const text = document.createElement("p");
+      text.textContent = chunk.chunk_text;
+      block.append(label, text);
+      group.append(block);
+    });
+    return group;
+  }
+
+  async function loadChunks() {
+    const status = $("chunks-status");
+    status.className = "status";
+    status.textContent = "Loading...";
+    try {
+      const path = tenantPath("chunks");
+      const response = await fetch(path);
+      const body = await response.json().catch(() => null);
+      showApiCall("chunks-api", { method: "GET", path, status: response.status, response: body });
+      if (!response.ok) throw new Error(errorText(response.status, body));
+      const bySource = new Map();
+      body.chunks.forEach((chunk) => {
+        bySource.set(chunk.source, [...(bySource.get(chunk.source) || []), chunk]);
+      });
+      $("chunks").replaceChildren(
+        ...[...bySource].map(([source, chunks]) => renderDocumentChunks(source, chunks))
+      );
+      status.textContent = body.total
+        ? `${body.total} chunks in ${bySource.size} documents.`
+        : "No chunks stored for this tenant.";
+    } catch (error) {
+      status.className = "status bad";
+      status.textContent = error.message;
+    }
+  }
+
+  function ingest(payload) {
+    return withProgress($("ingest-status"), "Ingesting", async () => {
+      const result = await callApi("ingest-api", tenantPath("ingest"), payload);
+      // Pinecone takes a few seconds to show new chunks, so load now and again shortly.
+      loadChunks();
+      setTimeout(loadChunks, 10000);
+      return `Stored ${result.documents_stored} documents and ${result.chunks_stored} chunks. Wait about 10 seconds before asking.`;
+    });
+  }
+
+  function documentsFromForm() {
+    const brand = $("doc-brand").value.trim();
+    if (!brand) throw new Error("Enter a brand.");
+    if (activeTab === "url") {
+      const urls = $("doc-urls").value.split("\n").map((url) => url.trim()).filter(Boolean);
+      if (!urls.length) throw new Error("Enter at least one URL.");
+      return urls.map((url) => ({ url, brand }));
+    }
+    const text = $("doc-text").value.trim();
+    if (!text) throw new Error("Enter some text.");
+    return [{ text, brand }];
+  }
+
+  function renderCitation(citation) {
+    const block = document.createElement("div");
+    block.className = "citation";
+    const isLink = /^https?:\/\//.test(citation.source);
+    const source = document.createElement(isLink ? "a" : "b");
+    source.textContent = citation.source;
+    if (isLink) {
+      source.href = citation.source;
+      source.target = "_blank";
+      source.rel = "noopener noreferrer";
+    }
+    const brand = document.createElement("div");
+    brand.style.fontSize = "13px";
+    brand.textContent = `Brand: ${citation.brand}`;
+    const text = document.createElement("p");
+    text.textContent = citation.chunk_text;
+    block.append(source, brand, text);
+    return block;
+  }
+
+  function renderAnswer(result) {
+    $("found").textContent = result.found_in_corpus ? "Found in corpus" : "Not in corpus";
+    $("found").className = `badge ${result.found_in_corpus ? "good" : "bad"}`;
+    $("answer").textContent = result.answer;
+    $("citations-block").hidden = result.citations.length === 0;
+    $("citations").replaceChildren(...result.citations.map(renderCitation));
+    $("trace").replaceChildren(...result.trace.map((entry) => {
+      const item = document.createElement("li");
+      const node = document.createElement("b");
+      node.textContent = entry.node;
+      item.append(node, `: ${entry.detail}`);
+      return item;
+    }));
+    $("result").hidden = false;
+  }
+
+  document.querySelectorAll("[data-tab]").forEach((tab) => {
+    tab.addEventListener("click", () => {
+      activeTab = tab.dataset.tab;
+      document.querySelectorAll("[data-tab]").forEach((other) => {
+        other.setAttribute("aria-selected", String(other === tab));
+      });
+      document.querySelectorAll("[data-panel]").forEach((panel) => {
+        panel.hidden = !panel.dataset.panel.split(" ").includes(activeTab);
+      });
+    });
+  });
+
+  $("ingest-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    try {
+      ingest({ documents: documentsFromForm() });
+    } catch (error) {
+      $("ingest-status").className = "status bad";
+      $("ingest-status").textContent = error.message;
+    }
+  });
+
+  document.querySelectorAll(".sample").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const response = await fetch(button.dataset.url || `/samples/${button.dataset.file}`);
+      ingest(await response.json());
+    });
+  });
+
+  document.querySelectorAll(".examples button").forEach((button) => {
+    button.addEventListener("click", () => {
+      $("question").value = button.textContent;
+      $("question").focus();
+    });
+  });
+
+  $("ask-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    const question = $("question").value.trim();
+    if (!question) {
+      $("ask-status").className = "status bad";
+      $("ask-status").textContent = "Enter a question.";
+      return;
+    }
+    $("result").hidden = true;
+    $("both-section").hidden = true;
+    $("trace").replaceChildren();
+    const payload = {
+      question,
+      hybrid: $("use-hybrid").checked,
+      rerank: $("use-rerank").checked,
+    };
+    withProgress($("ask-status"), "Thinking, this can take up to a minute", async () => {
+      const result = await callApi("ask-api", tenantPath("ask"), payload);
+      renderAnswer(result);
+      return "Done.";
+    });
+  });
+
+  function renderBothCard(title, result) {
+    const card = document.createElement("div");
+    card.className = "both-card";
+    const heading = document.createElement("h4");
+    heading.textContent = title;
+    const badge = document.createElement("span");
+    badge.className = `badge ${result.found_in_corpus ? "good" : "bad"}`;
+    badge.textContent = result.found_in_corpus ? "Found in corpus" : "Not in corpus";
+    const answer = document.createElement("p");
+    answer.textContent = result.answer;
+    const sources = document.createElement("small");
+    sources.textContent = `Citations: ${[...new Set(result.citations.map((item) => item.source))].join(", ") || "none"}`;
+    const path = document.createElement("small");
+    path.textContent = `Path: ${result.trace.map((entry) => entry.node).join(" > ")}`;
+    card.append(heading, badge, answer, sources, path);
+    return card;
+  }
+
+  $("ask-both").addEventListener("click", () => {
+    const question = $("question").value.trim();
+    if (!question) {
+      $("ask-status").className = "status bad";
+      $("ask-status").textContent = "Enter a question.";
+      return;
+    }
+    $("result").hidden = true;
+    $("both-section").hidden = true;
+    $("trace").replaceChildren();
+    withProgress($("ask-status"), "Asking both ways, this can take two minutes", async () => {
+      const path = tenantPath("ask");
+      const plain = await callApi("ask-api", path, { question, hybrid: false, rerank: false });
+      const enhanced = await callApi("ask-api", path, { question, hybrid: true, rerank: true }, true);
+      $("both").replaceChildren(
+        renderBothCard("Without (semantic only)", plain),
+        renderBothCard("With hybrid + reranking", enhanced),
+      );
+      $("both-section").hidden = false;
+      renderAnswer(enhanced);
+      $("result").hidden = true;
+      return "Done.";
+    });
+  });
+
+  function renderComparison(body) {
+    $("compare-tiles").replaceChildren(...body.summary.map((row) => {
+      const tile = document.createElement("div");
+      tile.className = "tile";
+      const value = document.createElement("b");
+      value.textContent = percent(row.found_in_top_5);
+      const name = document.createElement("span");
+      name.textContent = row.mode;
+      const detail = document.createElement("span");
+      detail.textContent = `In top 5. Ranked first: ${percent(row.found_first)}`;
+      tile.append(value, name, detail);
+      return tile;
+    }));
+
+    const modes = body.summary.map((row) => row.mode);
+    const table = document.createElement("table");
+    const head = table.insertRow();
+    ["Question", "Type", ...modes].forEach((label) => {
+      const cell = document.createElement("th");
+      cell.textContent = label;
+      head.append(cell);
+    });
+    body.results.forEach((result) => {
+      const row = table.insertRow();
+      row.insertCell().textContent = result.question;
+      row.insertCell().textContent = result.kind;
+      modes.forEach((mode) => {
+        const rank = result.ranks[mode];
+        const cell = row.insertCell();
+        cell.textContent = rank === null ? "Missed" : `#${rank}`;
+        if (rank === null) cell.className = "rank-missed";
+        if (rank === 1) cell.className = "rank-first";
+      });
+    });
+    $("compare-table").replaceChildren(table);
+  }
+
+  $("compare-run").addEventListener("click", () => {
+    const button = $("compare-run");
+    button.disabled = true;
+    withProgress($("compare-status"), "Comparing search modes", async () => {
+      const path = `${tenantPath("compare")}?dataset=${$("compare-dataset").value}`;
+      const body = await callApi("compare-api", path, {});
+      renderComparison(body);
+      return `Tested ${body.results.length} questions on ${body.chunks_searched} chunks.`;
+    }).finally(() => { button.disabled = false; });
+  });
+
+  const METRIC_LABELS = {
+    accuracy: "Accuracy",
+    faithfulness: "Faithfulness",
+    answer_correctness: "Answer correctness",
+    context_recall: "Context recall",
+  };
+  const percent = (value) => (value === null || value === undefined ? "n/a" : `${Math.round(value * 100)}%`);
+  let evalTimer = null;
+
+  function renderMetric(metric) {
+    const tile = document.createElement("div");
+    tile.className = `tile ${metric.met === null ? "" : metric.met ? "good" : "bad"}`;
+    const value = document.createElement("b");
+    value.textContent = percent(metric.value);
+    const name = document.createElement("span");
+    name.textContent = METRIC_LABELS[metric.name] || metric.name;
+    const target = document.createElement("span");
+    target.textContent = `Target ${percent(metric.target)}`;
+    tile.append(value, name, target);
+    return tile;
+  }
+
+  function renderEvalCase(result, index) {
+    const block = document.createElement("div");
+    block.className = "eval-case";
+    const badge = document.createElement("span");
+    badge.className = `badge ${!result.error && result.passed ? "good" : "bad"}`;
+    badge.textContent = result.error ? "Error" : result.passed ? "Pass" : "Fail";
+    const title = document.createElement("h4");
+    title.textContent = `${index + 1}. ${result.question}`;
+    const details = document.createElement("dl");
+    const scores = Object.entries(result.scores)
+      .map(([name, value]) => `${METRIC_LABELS[name] || name}: ${percent(value)}`)
+      .join(", ");
+    const rows = [
+      ["Expected", result.expected],
+      ["Got", result.actual || "(no answer)"],
+      ["Found", `${result.found_in_corpus} (expected ${result.expected_found})`],
+      ["Chunks used", String(result.chunks_used)],
+      ["Scores", scores || "Not scored"],
+    ];
+    if (result.error) rows.push(["Error", result.error]);
+    rows.forEach(([label, text]) => {
+      const term = document.createElement("dt");
+      term.textContent = label;
+      const value = document.createElement("dd");
+      value.textContent = text;
+      details.append(term, value);
+    });
+    block.append(badge, title, details);
+    return block;
+  }
+
+  function renderEvaluation(status) {
+    const element = $("eval-status");
+    const running = status.state === "running";
+    document.querySelectorAll(".eval-start").forEach((button) => { button.disabled = running; });
+    element.className = `status ${status.state === "finished" ? "good" : status.state === "failed" ? "bad" : ""}`;
+    element.textContent = {
+      idle: "No evaluation run yet for this tenant.",
+      running: `Running... ${status.done} of ${status.total} questions done. This takes several minutes.`,
+      finished: `Finished. ${status.cases.length} data points: ${status.cases.filter((item) => item.passed && !item.error).length} passed, ${status.cases.filter((item) => !item.passed && !item.error).length} failed, ${status.cases.filter((item) => item.error).length} errors.`,
+      failed: "The evaluation stopped early. Check Logs above.",
+    }[status.state];
+    $("eval-tiles").replaceChildren(...status.metrics.map(renderMetric));
+    $("eval-cases").replaceChildren(...status.cases.map(renderEvalCase));
+  }
+
+  async function loadEvaluation() {
+    clearTimeout(evalTimer);
+    try {
+      const path = tenantPath("evaluate");
+      const response = await fetch(path);
+      const status = await response.json();
+      showApiCall("eval-result-api", { method: "GET", path, status: response.status, response: status });
+      renderEvaluation(status);
+      loadLogs();
+      if (status.state === "running") evalTimer = setTimeout(loadEvaluation, 2000);
+    } catch {
+      evalTimer = setTimeout(loadEvaluation, 5000);
+    }
+  }
+
+  document.querySelectorAll(".eval-start").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const limit = button.dataset.limit;
+      try {
+        const path = `${tenantPath("evaluate")}${limit ? `?limit=${limit}` : ""}`;
+        const response = await fetch(path, { method: "POST" });
+        const body = await response.json().catch(() => null);
+        showApiCall("eval-api", { method: "POST", path, status: response.status, response: body });
+        if (!response.ok) throw new Error(errorText(response.status, body));
+        loadEvaluation();
+      } catch (error) {
+        $("eval-status").className = "status bad";
+        $("eval-status").textContent = error.message;
+      }
+    });
+  });
+
+  $("load-chunks").addEventListener("click", loadChunks);
+
+  $("clear-logs").addEventListener("click", () => $("logs").replaceChildren());
+
+  // Each tenant has its own logs and chunks, so switching clears what is on screen.
+  $("tenant").addEventListener("change", () => {
+    lastLogId = 0;
+    $("logs").replaceChildren();
+    $("chunks").replaceChildren();
+    $("trace").replaceChildren();
+    $("result").hidden = true;
+    $("both-section").hidden = true;
+    $("compare-tiles").replaceChildren();
+    $("compare-table").replaceChildren();
+    $("compare-status").textContent = "";
+    ["ingest-api", "ask-api", "eval-api", "compare-api"].forEach((id) => $(id).replaceChildren());
+    loadLogs();
+    loadChunks();
+    loadEvaluation();
+  });
+
+  loadLogs();
+  loadChunks();
+  loadEvaluation();
+
+  $("health-button").addEventListener("click", async () => {
+    $("health-text").textContent = "Checking...";
+    try {
+      const response = await fetch("/health");
+      const health = await response.json();
+      showApiCall("health-api", { method: "GET", path: "/health", status: response.status, response: health });
+      const label = (ok) => (ok ? "ok" : "failing");
+      $("health-text").textContent = `Pinecone ${label(health.vector_db)}, Gemini ${label(health.llm)}`;
+    } catch {
+      $("health-text").textContent = "Service not reachable";
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+{
+  "questions": [
+    {
+      "kind": "Exact product name",
+      "question": "What does the Novablast 5 weigh in a US men's size 10?",
+      "gold": "weighing 9.6oz"
+    },
+    {
+      "kind": "Exact product name",
+      "question": "How many colors does the Pegasus 41 come in?",
+      "gold": "available in 16 colors"
+    },
+    {
+      "kind": "Exact product name",
+      "question": "What heel height does the Pegasus 41 have?",
+      "gold": "37mm of cushioning at the heel"
+    },
+    {
+      "kind": "Exact product name",
+      "question": "How much does the METASPEED SKY+ cost?",
+      "gold": "$250/£225/AU$330"
+    },
+    {
+      "kind": "Exact product name",
+      "question": "Should I size up for the Gel Lyte V?",
+      "gold": "Gel Lyte V style has a mono sock liner"
+    },
+    {
+      "kind": "Exact term",
+      "question": "What is FF Blast Max Plus?",
+      "gold": "FF Blast Max Plus"
+    },
+    {
+      "kind": "Different words",
+      "question": "Which is cheaper, the Nike Pegasus 41 or the Asics Novablast 5?",
+      "gold": "$145 vs $150"
+    },
+    {
+      "kind": "Different words",
+      "question": "How long does a Nike race shoe last before it wears out?",
+      "gold": "very limited durability (150-200 miles)"
+    },
+    {
+      "kind": "Different words",
+      "question": "Who should pick ASICS if their feet are broad?",
+      "gold": "accommodates wider feet better"
+    },
+    {
+      "kind": "Different words",
+      "question": "How much room should my toes have in a running shoe?",
+      "gold": "half a thumb"
+    }
+  ]
+}

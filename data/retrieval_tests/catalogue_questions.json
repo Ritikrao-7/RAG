@@ -1,0 +1,79 @@
+{
+  "questions": [
+    {
+      "kind": "Exact product name",
+      "question": "What is the price of the Stridewell Aero 4?",
+      "gold": "Aero 4 (SKU"
+    },
+    {
+      "kind": "Exact product name",
+      "question": "How much does the Terra 2 weigh?",
+      "gold": "Terra 2 (SKU"
+    },
+    {
+      "kind": "Exact product name",
+      "question": "Tell me about the Pulse 6.",
+      "gold": "Pulse 6 (SKU"
+    },
+    {
+      "kind": "Exact product name",
+      "question": "What does the Aero 7 cost?",
+      "gold": "Aero 7 (SKU"
+    },
+    {
+      "kind": "Exact code",
+      "question": "Which shoe has SKU SW-2306?",
+      "gold": "SKU SW-2306"
+    },
+    {
+      "kind": "Exact code",
+      "question": "What is product SW-1403?",
+      "gold": "SKU SW-1403"
+    },
+    {
+      "kind": "Exact code",
+      "question": "Price of SW-3605?",
+      "gold": "SKU SW-3605"
+    },
+    {
+      "kind": "Exact code",
+      "question": "Is SW-2301 a trail shoe?",
+      "gold": "SKU SW-2301"
+    },
+    {
+      "kind": "Different words",
+      "question": "How do I get my money back?",
+      "gold": "Refunds are issued"
+    },
+    {
+      "kind": "Different words",
+      "question": "My sole came off after a few months, what now?",
+      "gold": "manufacturing defects"
+    },
+    {
+      "kind": "Different words",
+      "question": "How long until my parcel gets here?",
+      "gold": "Orders ship"
+    },
+    {
+      "kind": "Different words",
+      "question": "What should I do with old trainers I no longer wear?",
+      "gold": "recycle them"
+    },
+    {
+      "kind": "Needs understanding",
+      "question": "Which shoe should I avoid in the rain?",
+      "gold": "loses grip on wet pavement"
+    },
+    {
+      "kind": "Needs understanding",
+      "question": "Is there a shoe for someone with broad feet?",
+      "gold": "extra-wide"
+    },
+    {
+      "kind": "Needs understanding",
+      "question": "Which shoe is made from waste pulled out of the sea?",
+      "gold": "recycled ocean plastic"
+    }
+  ]
+}

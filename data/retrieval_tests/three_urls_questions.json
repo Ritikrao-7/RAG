@@ -1,0 +1,14 @@
+{
+  "questions": [
+    {"kind": "Exact term", "question": "What is FF Blast Max Plus?", "gold": "FF Blast Max Plus"},
+    {"kind": "Exact product name", "question": "What does the Novablast 5 weigh in a US men's size 10?", "gold": "weighing 9.6oz"},
+    {"kind": "Exact product name", "question": "How many colors does the Pegasus 41 come in?", "gold": "available in 16 colors"},
+    {"kind": "Exact product name", "question": "Which is cheaper, the Nike Pegasus 41 or the Asics Novablast 5?", "gold": "$145 vs $150"},
+    {"kind": "Exact product name", "question": "Should I size up for the Gel Lyte V?", "gold": "Gel Lyte V style has a mono sock liner"},
+    {"kind": "Different words", "question": "What do reviewers say about ASICS durability compared to Nike?", "gold": "Generally higher (500-700 miles)"},
+    {"kind": "Different words", "question": "How long does a Nike race shoe last before it wears out?", "gold": "very limited durability (150-200 miles)"},
+    {"kind": "Different words", "question": "Should I buy a bigger size in ASICS than in Nike?", "gold": "go half a size up from your Nike size"},
+    {"kind": "Different words", "question": "How much room should my toes have in a running shoe?", "gold": "half a thumb"},
+    {"kind": "Exact fact", "question": "When were ASICS and Nike founded?", "gold": "Founded 1949"}
+  ]
+}

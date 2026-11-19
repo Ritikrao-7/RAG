@@ -1,0 +1,942 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Retrieval Lens</title>
+<meta name="description" content="Add your own text and pages, ask questions, and watch each retrieval step happen.">
+<style>
+  :root {
+    --bg: #f5f5f2; --card: #ffffff; --text: #1c1c1a; --muted: #686862; --line: #dcdcd6; --soft: #efefea;
+    --accent: #2f5fd0; --accent-soft: #e4ebfb; --accent-text: #ffffff;
+    --good: #1f7a4d; --good-soft: #e0f1e8; --bad: #b3372f; --bad-soft: #f8e3e1; --warn: #9a6400;
+    --panel-h: 44vh;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #151514; --card: #1f1f1d; --text: #ecece6; --muted: #a2a29b; --line: #373734; --soft: #292926;
+      --accent: #7ea2f2; --accent-soft: #232c40; --accent-text: #10131a;
+      --good: #5fc592; --good-soft: #1d3127; --bad: #ef8a80; --bad-soft: #3a2220; --warn: #e2b04a;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #151514; --card: #1f1f1d; --text: #ecece6; --muted: #a2a29b; --line: #373734; --soft: #292926;
+    --accent: #7ea2f2; --accent-soft: #232c40; --accent-text: #10131a;
+    --good: #5fc592; --good-soft: #1d3127; --bad: #ef8a80; --bad-soft: #3a2220; --warn: #e2b04a;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  button, input, textarea { font: inherit; color: inherit; }
+  h1 { font-size: 18px; margin: 0; letter-spacing: -.01em; white-space: nowrap; }
+  h2 { font-size: 15px; margin: 0 0 12px; }
+  .muted { color: var(--muted); }
+  .small { font-size: 13px; }
+
+  header.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--line); background: var(--card); }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .logo { width: 26px; height: 26px; border-radius: 7px; background: var(--accent); display: grid; place-items: center; color: var(--accent-text); font-weight: 700; font-size: 14px; }
+  .who { display: flex; align-items: center; gap: 8px; font-size: 13px; min-width: 0; }
+  .who span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .who button { white-space: nowrap; }
+  @media (max-width: 520px) { .who span { display: none; } }
+
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+  label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+  input[type=text], input[type=email], input[type=url], textarea { width: 100%; padding: 9px 11px; border: 1px solid var(--line); border-radius: 7px; background: var(--card); }
+  input:focus-visible, textarea:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  textarea { min-height: 88px; resize: vertical; }
+  .field { margin-bottom: 12px; }
+  button { padding: 8px 14px; border: 1px solid var(--line); border-radius: 7px; background: var(--soft); cursor: pointer; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); font-weight: 600; }
+  button.ghost { background: transparent; }
+  button.icon { padding: 5px 9px; line-height: 1; }
+  button:disabled { opacity: .55; cursor: not-allowed; }
+  .status { font-size: 13px; color: var(--muted); min-height: 1.4em; margin-top: 8px; }
+  .status.bad { color: var(--bad); }
+  .status.good { color: var(--good); }
+
+  /* Onboarding */
+  #onboarding { min-height: calc(100vh - 56px); display: grid; place-items: center; padding: 24px 16px; }
+  #onboarding .card { width: 100%; max-width: 420px; padding: 24px; }
+  #onboarding p { margin: 0 0 18px; }
+  .note { font-size: 12px; color: var(--muted); margin-top: 12px; }
+
+  /* Workspace */
+  #workspace { padding: 16px 16px calc(var(--panel-h) + 24px); max-width: 1240px; margin: 0 auto; }
+  body.panel-collapsed #workspace { padding-bottom: 72px; }
+  .grid { display: grid; grid-template-columns: minmax(280px, 380px) 1fr; gap: 16px; align-items: start; }
+  .stack { display: grid; gap: 16px; }
+  .tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+  .tabs button { padding: 5px 12px; font-size: 13px; }
+  .tabs button[aria-selected="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+  .sources { list-style: none; margin: 0; padding: 0; }
+  .sources li { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-top: 1px solid var(--line); font-size: 13px; }
+  .sources li:first-child { border-top: 0; }
+  .swatch { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+  .sources .name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .empty { font-size: 13px; color: var(--muted); padding: 6px 0; }
+  .head-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+  .head-row h2 { margin: 0; }
+
+  .modes { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 12px; }
+  .mode { display: flex; align-items: center; gap: 7px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 999px; font-size: 13px; color: var(--text); margin: 0; cursor: pointer; user-select: none; }
+  .mode input { margin: 0; accent-color: var(--accent); }
+  .mode.on { border-color: var(--accent); background: var(--accent-soft); }
+  .mode.locked { cursor: default; }
+  .mode small { color: var(--muted); }
+  .ask-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+  .badge { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+  .badge.good { background: var(--good-soft); color: var(--good); }
+  .badge.bad { background: var(--bad-soft); color: var(--bad); }
+  .answer-text { font-size: 16px; margin: 10px 0 4px; white-space: pre-wrap; }
+  .citation { border-top: 1px solid var(--line); padding: 10px 0 2px; font-size: 13px; }
+  .citation a, .citation b { color: var(--accent); word-break: break-all; font-weight: 600; text-decoration: none; }
+  .citation p { margin: 4px 0 0; color: var(--muted); white-space: pre-wrap; max-height: 90px; overflow: auto; }
+
+  /* Visualizer panel */
+  #panel { position: fixed; left: 0; right: 0; bottom: 0; height: var(--panel-h); background: var(--card); border-top: 1px solid var(--line); box-shadow: 0 -6px 24px rgb(0 0 0 / .06); display: flex; flex-direction: column; z-index: 10; }
+  body.panel-collapsed #panel { height: auto; }
+  body.panel-collapsed #panel .viz { display: none; }
+  .toolbar { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .toolbar h2 { margin: 0 8px 0 0; font-size: 14px; }
+  .toolbar .spacer { flex: 1; }
+  .step-count { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; min-width: 72px; }
+  .speed { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); margin: 0; }
+  .speed input { width: 90px; accent-color: var(--accent); }
+  .live { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+  .live.on { background: var(--good); animation: pulse 1s infinite; }
+  @keyframes pulse { 50% { opacity: .3; } }
+
+  .viz { flex: 1; min-height: 0; display: grid; grid-template-columns: 300px 1fr 300px; }
+  .viz > div { min-height: 0; padding: 12px 16px; }
+  .viz-graph { border-right: 1px solid var(--line); overflow: auto; }
+  .viz-explain { border-left: 1px solid var(--line); overflow: auto; }
+  .viz-board { display: flex; gap: 12px; overflow: auto; }
+
+  svg.pipeline { width: 100%; height: auto; display: block; }
+  .pnode rect, .pnode circle { fill: var(--soft); stroke: var(--line); stroke-width: 1.2; transition: fill .3s, stroke .3s; }
+  .pnode text { fill: var(--muted); font-size: 11px; text-anchor: middle; dominant-baseline: central; font-family: inherit; transition: fill .3s; }
+  .pnode.visited rect, .pnode.visited circle { stroke: var(--accent); }
+  .pnode.visited text { fill: var(--text); }
+  .pnode.active rect, .pnode.active circle { fill: var(--accent); stroke: var(--accent); }
+  .pnode.active text { fill: var(--accent-text); font-weight: 600; }
+  .pnode.active.bad rect { fill: var(--bad); stroke: var(--bad); }
+  .pedge { fill: none; stroke: var(--line); stroke-width: 1.6; transition: stroke .3s; }
+  .pedge.done { stroke: var(--accent); }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 12px; }
+  .chip { font-size: 11px; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+  .chip.off { border-style: dashed; opacity: .55; }
+  .chip.done { border-color: var(--accent); color: var(--text); }
+  .chip.active { background: var(--accent); border-color: var(--accent); color: var(--accent-text); font-weight: 600; }
+  .legend { margin-top: 14px; font-size: 12px; color: var(--muted); }
+  .legend div { display: flex; align-items: center; gap: 6px; margin-top: 3px; overflow: hidden; }
+  .legend span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .column { flex: 1 1 0; min-width: 230px; max-width: 420px; display: flex; flex-direction: column; min-height: 0; }
+  .column h3 { margin: 0 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; }
+  .column ol { list-style: none; margin: 0; padding: 9px 2px 2px 0; overflow-y: auto; display: grid; gap: 6px; align-content: start; }
+  .tile { position: relative; display: grid; grid-template-columns: 26px 1fr auto; gap: 2px 8px; align-items: center; padding: 7px 9px 7px 0; border: 1px solid var(--line); border-left: 4px solid var(--stripe, var(--line)); border-radius: 7px; background: var(--card); font-size: 12px; transition: opacity .35s, background .35s, border-color .35s; }
+  .tile .rank { grid-row: span 2; text-align: center; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .tile .src { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+  .tile .score { font-variant-numeric: tabular-nums; color: var(--muted); text-align: right; }
+  .tile .text { grid-column: 2 / 4; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .tile .tags { position: absolute; top: -8px; right: 8px; display: flex; gap: 4px; }
+  .tag { font-size: 10px; font-weight: 700; padding: 0 6px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); line-height: 16px; }
+  .tag.up { color: var(--good); border-color: var(--good); }
+  .tag.down { color: var(--bad); border-color: var(--bad); }
+  .tag.new, .tag.both { color: var(--accent); border-color: var(--accent); }
+  .tile.checking { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+  .tile.relevant { background: var(--good-soft); }
+  .tile.rejected { opacity: .45; }
+  .tile.cited { background: var(--good-soft); border-color: var(--good); }
+  .board-empty { margin: auto; text-align: center; color: var(--muted); font-size: 13px; max-width: 360px; }
+
+  .explain-step { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--accent); }
+  .explain-title { font-size: 15px; font-weight: 600; margin: 4px 0 6px; }
+  .explain-body { font-size: 13px; color: var(--muted); margin: 0; white-space: pre-wrap; }
+  .explain-body b { color: var(--text); font-weight: 600; }
+  .formula { margin-top: 10px; padding: 8px 10px; background: var(--soft); border-radius: 7px; font: 12px/1.5 ui-monospace, Menlo, monospace; overflow-x: auto; }
+  .explain.bad .explain-step { color: var(--bad); }
+
+  @media (max-width: 1100px) {
+    .viz { grid-template-columns: 260px 1fr; grid-template-rows: auto 1fr; }
+    .viz-graph { grid-row: 1; }
+    .viz-explain { grid-column: 1; grid-row: 2; border-left: 0; border-right: 1px solid var(--line); border-top: 1px solid var(--line); }
+    .viz-board { grid-column: 2; grid-row: 1 / 3; }
+  }
+  @media (max-width: 860px) {
+    .grid { grid-template-columns: 1fr; }
+    #workspace, body.panel-collapsed #workspace { padding-bottom: 16px; }
+    #panel { position: static; height: auto; box-shadow: none; border: 1px solid var(--line); border-radius: 10px; margin: 0 16px 24px; }
+    .viz { display: block; }
+    .viz > div { border: 0 !important; border-top: 1px solid var(--line) !important; }
+    .viz-board { flex-direction: column; max-height: 70vh; }
+    .column { flex: none; max-width: none; min-width: 0; }
+    .column ol { max-height: 50vh; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><div class="logo" aria-hidden="true">R</div><h1>Retrieval Lens</h1></div>
+  <div class="who" id="who" hidden>
+    <span id="who-name"></span>
+    <button class="ghost icon small" id="switch-user" title="Use a different name and email on this browser">Switch user</button>
+  </div>
+</header>
+
+<section id="onboarding" hidden>
+  <form class="card" id="signup">
+    <h2 style="font-size:20px;margin-bottom:6px">Create your workspace</h2>
+    <p class="muted small">Add your own notes and web pages, ask questions about them, and watch every retrieval step as it happens.</p>
+    <div class="field"><label for="su-name">Name</label><input id="su-name" type="text" required maxlength="100" autocomplete="name"></div>
+    <div class="field"><label for="su-email">Email</label><input id="su-email" type="email" required maxlength="254" autocomplete="email"></div>
+    <button class="primary" type="submit" style="width:100%">Start</button>
+    <div class="status" id="su-status" role="status"></div>
+    <p class="note">We store your name and email to see who uses this demo. There is no password: your workspace id is saved in this browser only, so clearing site data starts a new workspace. Don't add private documents.</p>
+  </form>
+</section>
+
+<main id="workspace" hidden>
+  <div class="grid">
+    <div class="stack">
+      <section class="card" aria-labelledby="add-title">
+        <h2 id="add-title">Add sources</h2>
+        <div class="tabs" role="tablist">
+          <button type="button" role="tab" aria-selected="true" data-tab="url">Web pages</button>
+          <button type="button" role="tab" aria-selected="false" data-tab="text">Paste text</button>
+        </div>
+        <form id="ingest-form">
+          <div data-panel="url">
+            <div class="field"><label for="urls">URLs, one per line (up to 5)</label><textarea id="urls" rows="3" placeholder="https://example.com/blog/some-article"></textarea></div>
+          </div>
+          <div data-panel="text" hidden>
+            <div class="field"><label for="text-title">Title</label><input id="text-title" type="text" maxlength="120" placeholder="Meeting notes"></div>
+            <div class="field"><label for="text-body">Text</label><textarea id="text-body" rows="6" maxlength="200000"></textarea></div>
+          </div>
+          <div class="field"><label for="tag">Topic tag</label><input id="tag" type="text" maxlength="60" value="general"></div>
+          <button class="primary" type="submit" id="ingest-btn">Add</button>
+          <div class="status" id="ingest-status" role="status"></div>
+        </form>
+      </section>
+
+      <section class="card" aria-labelledby="sources-title">
+        <div class="head-row"><h2 id="sources-title">Your sources</h2><span class="small muted" id="chunk-total"></span></div>
+        <ul class="sources" id="sources"></ul>
+      </section>
+    </div>
+
+    <div class="stack">
+      <section class="card" aria-labelledby="ask-title">
+        <h2 id="ask-title">Ask a question</h2>
+        <form id="ask-form">
+          <textarea id="question" rows="2" maxlength="1000" placeholder="What does the article say about…" required></textarea>
+          <div class="modes" role="group" aria-label="Search modes">
+            <label class="mode on locked" title="Always on: finds chunks whose meaning is close to the question"><input type="checkbox" checked disabled> Semantic <small>default</small></label>
+            <label class="mode" title="Adds BM25 keyword matching, merged with reciprocal rank fusion"><input type="checkbox" id="hybrid"> Hybrid <small>+ BM25</small></label>
+            <label class="mode" title="A reranker model reads each candidate with the question and reorders them"><input type="checkbox" id="rerank"> Rerank <small>cross-encoder</small></label>
+          </div>
+          <div class="ask-row">
+            <button class="primary" type="submit" id="ask-btn">Ask</button>
+            <span class="small muted" id="ask-hint">Add a source first, then ask about it.</span>
+          </div>
+          <div class="status" id="ask-status" role="status"></div>
+        </form>
+      </section>
+
+      <section class="card" id="result" hidden aria-live="polite">
+        <div class="head-row"><h2>Answer</h2><span id="result-badge"></span></div>
+        <p class="answer-text" id="answer"></p>
+        <div id="citations"></div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<section id="panel" hidden aria-label="Pipeline visualizer">
+  <div class="toolbar">
+    <h2>What's happening</h2>
+    <span class="live" id="live" title="Receiving steps from the server"></span>
+    <button class="icon" id="v-prev" title="Previous step" aria-label="Previous step">◀</button>
+    <button class="icon" id="v-play" title="Play or pause" aria-label="Play">▶</button>
+    <button class="icon" id="v-next" title="Next step" aria-label="Next step">▶▶</button>
+    <span class="step-count" id="v-count">No run yet</span>
+    <label class="speed">Speed <input type="range" id="v-speed" min="300" max="3000" step="100" value="1500" style="direction:rtl"></label>
+    <span class="spacer"></span>
+    <button class="ghost icon" id="v-collapse" aria-expanded="true">Hide</button>
+  </div>
+  <div class="viz">
+    <div class="viz-graph">
+      <svg class="pipeline" viewBox="0 0 300 172" role="img" aria-label="Agent graph: retrieve, grade, then answer, rewrite or not found">
+        <defs>
+          <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" style="fill: var(--line)"/></marker>
+          <marker id="arrow-on" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" style="fill: var(--accent)"/></marker>
+        </defs>
+        <path class="pedge" data-edge="start>retrieve" d="M26 70 L45 70"/>
+        <path class="pedge" data-edge="retrieve>grade" d="M117 70 L144 70"/>
+        <path class="pedge" data-edge="grade>answer" d="M206 60 L225 40"/>
+        <path class="pedge" data-edge="grade>not_found" d="M206 80 L225 100"/>
+        <path class="pedge" data-edge="grade>rewrite" d="M176 85 Q176 148 164 148"/>
+        <path class="pedge" data-edge="rewrite>retrieve" d="M96 148 Q82 148 82 87"/>
+        <g class="pnode" data-node="start"><circle cx="16" cy="70" r="10"/><text x="16" y="70">Q</text></g>
+        <g class="pnode" data-node="retrieve"><rect x="47" y="56" width="70" height="28" rx="7"/><text x="82" y="70">retrieve</text></g>
+        <g class="pnode" data-node="grade"><rect x="146" y="56" width="60" height="28" rx="7"/><text x="176" y="70">grade</text></g>
+        <g class="pnode" data-node="answer"><rect x="227" y="18" width="70" height="28" rx="7"/><text x="262" y="32">answer</text></g>
+        <g class="pnode" data-node="not_found"><rect x="227" y="94" width="70" height="28" rx="7"/><text x="262" y="108">not found</text></g>
+        <g class="pnode" data-node="rewrite"><rect x="96" y="134" width="66" height="28" rx="7"/><text x="129" y="148">rewrite</text></g>
+      </svg>
+      <div class="chips" id="chips"></div>
+      <div class="legend" id="legend"></div>
+    </div>
+    <div class="viz-board" id="board"><p class="board-empty">Ask a question and each step will show up here: which chunks were found, how hybrid search and reranking reorder them, and which ones the grader keeps.</p></div>
+    <div class="viz-explain explain" id="explain">
+      <div class="explain-step">Ready</div>
+      <div class="explain-title">Nothing has run yet</div>
+      <p class="explain-body">Use ◀ and ▶▶ to step through a run, or ▶ to play it. Steps play at the speed you set, even when the server finishes sooner.</p>
+    </div>
+  </div>
+</section>
+
+<script>
+(() => {
+  "use strict";
+  const $ = (id) => document.getElementById(id);
+  const USER_KEY = "retrieval-lens-user";
+  const PANEL_KEY = "retrieval-lens-panel-collapsed";
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const store = {
+    get(key) { try { return localStorage.getItem(key); } catch { return null; } },
+    set(key, value) { try { localStorage.setItem(key, value); } catch {} },
+    remove(key) { try { localStorage.removeItem(key); } catch {} },
+  };
+
+  function el(tag, props = {}, ...children) {
+    const node = document.createElement(tag);
+    for (const [key, value] of Object.entries(props)) {
+      if (value == null || value === false) continue;
+      if (key === "class") node.className = value;
+      else if (key === "style") node.style.cssText = value;
+      else if (key.startsWith("on")) node.addEventListener(key.slice(2), value);
+      else if (key === "dataset") Object.assign(node.dataset, value);
+      else node.setAttribute(key, value === true ? "" : value);
+    }
+    for (const child of children.flat()) {
+      if (child == null || child === false) continue;
+      node.append(child instanceof Node ? child : document.createTextNode(String(child)));
+    }
+    return node;
+  }
+
+  function setStatus(id, text, tone = "") {
+    const node = $(id);
+    node.textContent = text;
+    node.className = "status" + (tone ? " " + tone : "");
+  }
+
+  function errorText(status, body) {
+    if (body && typeof body.detail === "string") return body.detail;
+    if (body && Array.isArray(body.detail)) return body.detail.map((item) => item.msg).join("; ");
+    if (status === 429) return "Too many requests. Wait a minute and try again.";
+    return `Request failed (${status}).`;
+  }
+
+  async function api(method, path, payload) {
+    const response = await fetch(path, {
+      method,
+      headers: payload ? { "Content-Type": "application/json" } : {},
+      body: payload ? JSON.stringify(payload) : undefined,
+    });
+    let body = null;
+    try { body = await response.json(); } catch {}
+    if (!response.ok) {
+      const error = new Error(errorText(response.status, body));
+      error.status = response.status;
+      error.code = body && body.error;
+      throw error;
+    }
+    return body;
+  }
+
+  // Every source gets its own color, used in the source list, the legend and the tiles.
+  // Hues are handed out in order, a golden angle apart, so neighbours never look alike.
+  const hues = new Map();
+  function colorOf(source) {
+    if (!hues.has(source)) hues.set(source, Math.round((215 + hues.size * 137.5) % 360));
+    return `hsl(${hues.get(source)} 62% 52%)`;
+  }
+  function shortSource(source) {
+    try {
+      const url = new URL(source);
+      const path = url.pathname.replace(/\/$/, "").split("/").pop();
+      return url.hostname.replace(/^www\./, "") + (path ? "/" + decodeURIComponent(path) : "");
+    } catch { return source; }
+  }
+
+  // ---------- User ----------
+  let user = null;
+  const tenant = (action) => `/tenants/${encodeURIComponent(user.id)}/${action}`;
+
+  async function start() {
+    const saved = store.get(USER_KEY);
+    if (saved) {
+      try {
+        user = await api("GET", `/users/${encodeURIComponent(saved)}`);
+        return openWorkspace();
+      } catch (error) {
+        if (error.status !== 404) {
+          // The server is unreachable; keep the saved id and try anyway.
+          user = { id: saved, name: "" };
+          return openWorkspace();
+        }
+        store.remove(USER_KEY);
+      }
+    }
+    $("onboarding").hidden = false;
+    $("su-name").focus();
+  }
+
+  $("signup").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const button = event.submitter;
+    button.disabled = true;
+    setStatus("su-status", "Creating your workspace…");
+    try {
+      user = await api("POST", "/users", { name: $("su-name").value, email: $("su-email").value });
+      store.set(USER_KEY, user.id);
+      $("onboarding").hidden = true;
+      openWorkspace();
+    } catch (error) {
+      setStatus("su-status", error.message, "bad");
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  $("switch-user").addEventListener("click", () => {
+    if (!confirm("Start with a different name and email? Your current sources stay with the old workspace and you won't be able to get back to them from this browser.")) return;
+    store.remove(USER_KEY);
+    location.reload();
+  });
+
+  function openWorkspace() {
+    $("workspace").hidden = false;
+    $("panel").hidden = false;
+    $("who").hidden = false;
+    $("who-name").textContent = user.name ? `Signed in as ${user.name}` : "Workspace";
+    loadSources();
+  }
+
+  // ---------- Sources ----------
+  async function loadSources() {
+    const list = $("sources");
+    try {
+      const body = await api("GET", tenant("chunks"));
+      const groups = new Map();
+      for (const chunk of body.chunks) groups.set(chunk.source, (groups.get(chunk.source) || 0) + 1);
+      list.replaceChildren(...[...groups].map(([source, count]) => el("li", {},
+        el("span", { class: "swatch", style: `background:${colorOf(source)}` }),
+        el("span", { class: "name", title: source }, shortSource(source)),
+        el("span", { class: "muted" }, `${count} chunk${count === 1 ? "" : "s"}`),
+        el("button", { class: "ghost icon small", title: "Remove this source", "aria-label": `Remove ${source}`, onclick: () => removeSource(source) }, "✕"),
+      )));
+      if (!groups.size) list.replaceChildren(el("li", { class: "empty" }, "Nothing yet. Add a web page or paste some text."));
+      $("chunk-total").textContent = body.total ? `${body.total} chunks` : "";
+      $("ask-hint").textContent = groups.size ? "Semantic search is always on; turn on the extras to compare." : "Add a source first, then ask about it.";
+    } catch (error) {
+      list.replaceChildren(el("li", { class: "empty" }, error.message));
+    }
+  }
+
+  async function removeSource(source) {
+    if (!confirm(`Remove ${shortSource(source)} and all its chunks?`)) return;
+    try {
+      await api("DELETE", `${tenant("sources")}?source=${encodeURIComponent(source)}`);
+    } catch (error) {
+      setStatus("ingest-status", error.message, "bad");
+    }
+    loadSources();
+  }
+
+  let ingestTab = "url";
+  document.querySelectorAll("[data-tab]").forEach((tab) => tab.addEventListener("click", () => {
+    ingestTab = tab.dataset.tab;
+    document.querySelectorAll("[data-tab]").forEach((other) => other.setAttribute("aria-selected", String(other === tab)));
+    document.querySelectorAll("[data-panel]").forEach((panel) => { panel.hidden = panel.dataset.panel !== ingestTab; });
+  }));
+
+  $("ingest-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const brand = $("tag").value.trim() || "general";
+    let documents;
+    if (ingestTab === "url") {
+      const urls = $("urls").value.split(/\s+/).map((url) => url.trim()).filter(Boolean);
+      if (!urls.length) return setStatus("ingest-status", "Enter at least one URL.", "bad");
+      if (urls.length > 5) return setStatus("ingest-status", "Add up to 5 URLs at a time.", "bad");
+      documents = urls.map((url) => ({ url, brand }));
+    } else {
+      const text = $("text-body").value.trim();
+      if (!text) return setStatus("ingest-status", "Paste some text first.", "bad");
+      documents = [{ text, brand, source: $("text-title").value.trim() || undefined }];
+    }
+    const button = $("ingest-btn");
+    button.disabled = true;
+    const started = Date.now();
+    const timer = setInterval(() => setStatus("ingest-status", `Fetching, chunking and embedding… ${Math.round((Date.now() - started) / 1000)}s`), 500);
+    try {
+      const result = await api("POST", tenant("ingest"), { documents });
+      setStatus("ingest-status", `Added ${result.documents_stored} source${result.documents_stored === 1 ? "" : "s"} as ${result.chunks_stored} chunks.`, "good");
+      if (ingestTab === "url") $("urls").value = "";
+      else { $("text-body").value = ""; $("text-title").value = ""; }
+      loadSources();
+    } catch (error) {
+      setStatus("ingest-status", error.message, "bad");
+    } finally {
+      clearInterval(timer);
+      button.disabled = false;
+    }
+  });
+
+  // ---------- Modes ----------
+  for (const id of ["hybrid", "rerank"]) {
+    $(id).addEventListener("change", () => $(id).closest(".mode").classList.toggle("on", $(id).checked));
+  }
+
+  // ---------- Ask ----------
+  $("ask-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const question = $("question").value.trim();
+    if (!question) return;
+    const mode = { hybrid: $("hybrid").checked, rerank: $("rerank").checked };
+    const button = $("ask-btn");
+    button.disabled = true;
+    $("result").hidden = true;
+    setStatus("ask-status", "Thinking…");
+    player.reset(question, mode);
+    if (document.body.classList.contains("panel-collapsed")) setCollapsed(false);
+    try {
+      await streamAsk({ question, ...mode }, (step) => {
+        player.add(step);
+        if (step.node === "answer" || step.node === "not_found") showAnswer(step);
+        if (step.type === "error") setStatus("ask-status", step.detail, "bad");
+      });
+      if ($("ask-status").className === "status") setStatus("ask-status", "");
+    } catch (error) {
+      setStatus("ask-status", error.message, "bad");
+      player.add({ type: "error", detail: error.message });
+    } finally {
+      player.finish();
+      button.disabled = false;
+    }
+  });
+
+  async function streamAsk(payload, onEvent) {
+    const response = await fetch(tenant("ask/stream"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "text/event-stream" },
+      body: JSON.stringify(payload),
+    });
+    if (!response.ok) {
+      let body = null;
+      try { body = await response.json(); } catch {}
+      throw new Error(errorText(response.status, body));
+    }
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      let split;
+      while ((split = buffer.indexOf("\n\n")) >= 0) {
+        const block = buffer.slice(0, split);
+        buffer = buffer.slice(split + 2);
+        const data = block.split("\n").filter((line) => line.startsWith("data: ")).map((line) => line.slice(6)).join("\n");
+        if (!data) continue;
+        const event = JSON.parse(data);
+        if (event.type === "done") return;
+        onEvent(event);
+      }
+    }
+  }
+
+  function showAnswer(step) {
+    $("result").hidden = false;
+    $("answer").textContent = step.answer;
+    $("result-badge").replaceChildren(step.found_in_corpus
+      ? el("span", { class: "badge good" }, "Found in your sources")
+      : el("span", { class: "badge bad" }, "Not in your sources"));
+    $("citations").replaceChildren(...(step.citations || []).map((citation) => {
+      let link;
+      try { new URL(citation.source); link = el("a", { href: citation.source, target: "_blank", rel: "noopener noreferrer" }, shortSource(citation.source)); }
+      catch { link = el("b", {}, citation.source); }
+      return el("div", { class: "citation" },
+        el("span", { class: "swatch", style: `display:inline-block;margin-right:6px;background:${colorOf(citation.source)}` }), link,
+        el("p", {}, citation.chunk_text));
+    }));
+  }
+
+  // ---------- Visualizer ----------
+  // Each server event becomes one or more frames. A frame is a full snapshot of what to
+  // draw, so stepping backwards is just drawing an earlier frame.
+  const STAGE_INFO = {
+    semantic: {
+      title: "Semantic", unit: "cosine", chip: "semantic",
+      explain: (n, mode) => [
+        "Semantic search",
+        `Pinecone compares the query vector with every stored chunk vector and returns the <b>${n}</b> closest by cosine similarity (1.0 = same direction).` +
+          (mode.hybrid || mode.rerank ? " With extras on, it fetches a wider candidate pool so the next steps have more to work with." : " These are the final results in semantic-only mode."),
+        "cos(q, c) = (q · c) / (|q| |c|)",
+      ],
+    },
+    keyword: {
+      title: "Keyword · BM25", unit: "bm25", chip: "keyword",
+      explain: (n) => [
+        "Keyword search (BM25)",
+        `BM25 scores every stored chunk on exact word matches. Rare words count for more, and long chunks don't get extra credit for being long. <b>${n}</b> chunks share words with the query. It catches names, SKUs and numbers that embeddings can blur.`,
+        "score = Σ IDF(word) · tf·(k₁+1) / (tf + k₁·(1 − b + b·len/avg))",
+      ],
+    },
+    fused: {
+      title: "Fused · RRF", unit: "rrf", chip: "fused",
+      explain: (n) => [
+        "Reciprocal rank fusion",
+        `The two lists are merged by rank, not by score, because cosine and BM25 scores aren't comparable. A chunk gets points from each list it appears in, so chunks <b>high in both</b> lists rise to the top. Kept: <b>${n}</b>.`,
+        "rrf(c) = Σ 1 / (60 + rank in list)",
+      ],
+    },
+    reranked: {
+      title: "Reranked", unit: "relevance", chip: "reranked",
+      explain: (n) => [
+        "Reranking",
+        `A cross-encoder (bge-reranker-v2-m3) reads the question and each candidate <b>together</b>, which is slower but more accurate than comparing two separate vectors. It rescores the candidates and keeps the top <b>${n}</b>. Arrows show how far each chunk moved.`,
+        null,
+      ],
+    },
+    top_k: {
+      title: "Top k", unit: "rrf", chip: "top_k",
+      explain: (n) => ["Keep the top results", `The best <b>${n}</b> fused chunks go on to grading.`, null],
+    },
+  };
+  const CHIPS = [
+    ["embed", "Embed"], ["semantic", "Semantic"], ["keyword", "BM25"], ["fused", "RRF fuse"], ["reranked", "Rerank"], ["top_k", "Top k"], ["grade", "Grade"],
+  ];
+
+  function formatScore(score, unit) {
+    if (score == null) return "–";
+    if (unit === "rrf") return score.toFixed(4);
+    if (unit === "bm25") return score.toFixed(2);
+    return score.toFixed(3);
+  }
+
+  function itemsOf(stage, unit, previous) {
+    const before = new Map((previous || []).map((item, index) => [item.id, index]));
+    return stage.chunks.map((chunk, index) => {
+      const tags = [];
+      if (previous) {
+        if (!before.has(chunk.id)) tags.push(["new", "new"]);
+        else if (before.get(chunk.id) > index) tags.push(["up", `▲${before.get(chunk.id) - index}`]);
+        else if (before.get(chunk.id) < index) tags.push(["down", `▼${index - before.get(chunk.id)}`]);
+      }
+      return { ...chunk, unit, tags, state: "" };
+    });
+  }
+
+  const player = {
+    frames: [], index: -1, playing: true, streaming: false, timer: null, ctx: null,
+
+    reset(question, mode) {
+      this.frames = [];
+      this.index = -1;
+      this.playing = true;
+      this.streaming = true;
+      this.ctx = { question, mode, visited: ["start"], edges: [], last: "start", final: [], sources: new Set() };
+      $("live").classList.add("on");
+      this.push({ node: "start", step: "Question", title: `“${question}”`, body: "The agent starts at retrieve. It can loop back through rewrite once if nothing relevant turns up.", columns: [] });
+      this.schedule(0);
+    },
+
+    finish() {
+      this.streaming = false;
+      $("live").classList.remove("on");
+      this.updateControls();
+      this.schedule();
+    },
+
+    push(frame) {
+      const ctx = this.ctx;
+      this.frames.push({ visited: [...ctx.visited], edges: [...ctx.edges], mode: ctx.mode, tone: "", chip: null, chipsDone: [], ...frame });
+      this.updateControls();
+      if (this.playing && this.index === this.frames.length - 2 && !this.timer) this.schedule();
+    },
+
+    enter(node) {
+      const ctx = this.ctx;
+      ctx.edges.push(`${ctx.last}>${node}`);
+      if (!ctx.visited.includes(node)) ctx.visited.push(node);
+      ctx.last = node;
+    },
+
+    add(event) {
+      const ctx = this.ctx;
+      if (event.type === "error") {
+        this.push({ node: ctx.last, tone: "bad", step: "Error", title: "The run stopped", body: event.detail, columns: [] });
+        return;
+      }
+      this.enter(event.node);
+      const handler = {
+        retrieve: () => this.addRetrieve(event),
+        grade: () => this.addGrade(event),
+        rewrite: () => this.push({
+          node: "rewrite", step: "Rewrite",
+          title: "Nothing relevant, so try a clearer question",
+          body: `The grader rejected every chunk. The LLM rewrites the question and the agent searches again. This happens at most once, so the graph can't loop forever.\n\n<b>Before:</b> ${escapeHtml(ctx.question)}\n<b>After:</b> ${escapeHtml(event.search_query)}`,
+          columns: ctx.final.length ? [{ title: "Rejected last round", unit: ctx.finalUnit, items: ctx.final.map((item) => ({ ...item, tags: [], state: "rejected" })) }] : [],
+        }),
+        answer: () => {
+          const cited = new Set((event.citations || []).map((citation) => citation.chunk_text));
+          this.push({
+            node: "answer", tone: event.found_in_corpus ? "" : "bad", step: "Answer",
+            title: event.found_in_corpus ? "Answer written from the kept chunks" : "Kept chunks didn't contain the answer",
+            body: event.found_in_corpus
+              ? `The LLM writes 2–3 sentences using <b>only</b> the highlighted chunks, and they're returned as citations.\n\n${escapeHtml(event.answer)}`
+              : "A chunk can be on-topic but still not answer the question. The LLM said so rather than guessing, so nothing was made up.",
+            columns: ctx.final.length ? [{ title: "Used for the answer", unit: ctx.finalUnit, items: ctx.final.map((item) => ({ ...item, tags: [], state: item.relevant ? (event.found_in_corpus ? "cited" : "rejected") : "rejected" })) }] : [],
+          });
+        },
+        not_found: () => this.push({
+          node: "not_found", tone: "bad", step: "Not found",
+          title: ctx.final.length ? "Nothing relevant, even after the rewrite" : "This workspace has no sources",
+          body: ctx.final.length ? "Both searches came back without a relevant chunk, so the agent says it can't answer instead of guessing." : "Add a web page or some text first, then ask again.",
+          columns: [],
+        }),
+      }[event.node];
+      if (handler) handler();
+    },
+
+    addRetrieve(event) {
+      const ctx = this.ctx;
+      const retrieval = event.retrieval || { stages: [], query: ctx.question, mode: "" };
+      const done = ["embed"];
+      this.push({
+        node: "retrieve", step: "Retrieve · embed", chip: "embed", chipsDone: [],
+        title: "Turn the question into a vector",
+        body: `Gemini embeddings turn the query into a list of numbers that captures its meaning. Chunks with similar meaning sit nearby.\n\n<b>Query:</b> ${escapeHtml(retrieval.query)}\n<b>Mode:</b> ${escapeHtml(retrieval.mode)}`,
+        columns: [],
+      });
+      let previous = null;
+      let semantic = null;
+      for (const stage of retrieval.stages) {
+        const info = STAGE_INFO[stage.stage];
+        if (!info) continue;
+        for (const chunk of stage.chunks) ctx.sources.add(chunk.source);
+        let columns;
+        if (stage.stage === "keyword") {
+          columns = [semantic, { title: info.title, unit: info.unit, items: itemsOf(stage, info.unit, null) }];
+          // Mark chunks that both searches found: those gain the most from fusion.
+          const keywordIds = new Set(stage.chunks.map((chunk) => chunk.id));
+          columns[0] = { ...semantic, items: semantic.items.map((item) => ({ ...item, tags: keywordIds.has(item.id) ? [["both", "both"]] : [] })) };
+        } else {
+          const items = itemsOf(stage, info.unit, previous && previous.items);
+          columns = [{ title: info.title, unit: info.unit, items }];
+        }
+        const [stepTitle, body, formula] = info.explain(stage.chunks.length, ctx.mode);
+        this.push({ node: "retrieve", step: `Retrieve · ${info.title.toLowerCase()}`, chip: info.chip, chipsDone: [...done], title: stepTitle, body, formula, columns });
+        done.push(info.chip);
+        // Rank arrows compare with the last single ranking: fused vs semantic, reranked vs fused.
+        const main = columns[columns.length - 1];
+        if (stage.stage === "semantic") semantic = main;
+        if (stage.stage !== "keyword") previous = main;
+      }
+      const last = retrieval.stages[retrieval.stages.length - 1];
+      ctx.finalUnit = last ? STAGE_INFO[last.stage].unit : "cosine";
+      ctx.final = last ? last.chunks.map((chunk) => ({ ...chunk, unit: ctx.finalUnit, tags: [], state: "" })) : [];
+      ctx.chipsDone = done;
+      if (!ctx.final.length) {
+        this.push({ node: "retrieve", step: "Retrieve", chip: null, chipsDone: done, title: "No chunks found", body: "The search returned nothing. That means this workspace has no stored chunks yet.", columns: [] });
+      }
+    },
+
+    addGrade(event) {
+      const ctx = this.ctx;
+      const verdicts = new Map((event.grades || []).map((grade) => [grade.id, grade.relevant]));
+      const items = ctx.final.map((item) => ({ ...item, tags: [], state: "" }));
+      const unit = ctx.finalUnit;
+      const done = [...(ctx.chipsDone || [])];
+      items.forEach((item, index) => {
+        const relevant = verdicts.get(item.id);
+        const snapshot = items.map((other, otherIndex) => {
+          if (otherIndex < index) return { ...other };
+          if (otherIndex === index) return { ...other, state: "checking", tags: [[relevant ? "up" : "down", relevant ? "✓ relevant" : "✗ off-topic"]] };
+          return { ...other, tags: [] };
+        });
+        this.push({
+          node: "grade", step: `Grade · chunk ${index + 1} of ${items.length}`, chip: "grade", chipsDone: done,
+          title: relevant ? "Relevant: kept" : "Not relevant: dropped",
+          body: `The LLM reads the question and this one chunk and answers yes or no: <i>does this passage help answer the question?</i> All chunks are graded at the same time on the server; here they're shown one by one.\n\n“${escapeHtml(item.text)}…”`,
+          columns: [{ title: "Grading", unit, items: snapshot }],
+        });
+        item.state = relevant ? "relevant" : "rejected";
+        item.tags = [[relevant ? "up" : "down", relevant ? "✓" : "✗"]];
+        item.relevant = relevant;
+      });
+      ctx.final = items;
+      const kept = items.filter((item) => item.relevant).length;
+      this.push({
+        node: "grade", step: "Grade · decide", chip: "grade", chipsDone: done,
+        title: kept ? `${kept} of ${items.length} kept, so go to answer` : (ctx.edges.includes("rewrite>retrieve") ? "None kept after the retry, so stop" : "None kept, so rewrite and retry"),
+        body: `${escapeHtml(event.detail)}. The next step depends on this:\n• some kept → <b>answer</b>\n• none kept, first try → <b>rewrite</b>\n• none kept after the retry → <b>not found</b>`,
+        columns: [{ title: "Graded", unit, items: items.map((item) => ({ ...item })) }],
+      });
+    },
+
+    schedule(delay) {
+      clearTimeout(this.timer);
+      this.timer = null;
+      if (!this.playing) return;
+      if (this.index >= this.frames.length - 1) {
+        if (!this.streaming) { this.playing = false; this.updateControls(); }
+        return;
+      }
+      this.timer = setTimeout(() => {
+        this.timer = null;
+        this.go(this.index + 1);
+        this.schedule();
+      }, delay ?? Number($("v-speed").value));
+    },
+
+    go(index) {
+      if (index < 0 || index >= this.frames.length) return;
+      this.index = index;
+      render(this.frames[index], this.ctx);
+      this.updateControls();
+    },
+
+    updateControls() {
+      const total = this.frames.length;
+      $("v-count").textContent = total ? `Step ${this.index + 1} of ${total}${this.streaming ? "+" : ""}` : "No run yet";
+      $("v-prev").disabled = this.index <= 0;
+      $("v-next").disabled = this.index >= total - 1;
+      $("v-play").textContent = this.playing ? "❚❚" : "▶";
+      $("v-play").setAttribute("aria-label", this.playing ? "Pause" : "Play");
+      $("v-play").disabled = !total;
+    },
+  };
+
+  function escapeHtml(text) {
+    return String(text ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
+  }
+
+  $("v-prev").addEventListener("click", () => { player.playing = false; player.schedule(); player.go(player.index - 1); });
+  $("v-next").addEventListener("click", () => { player.playing = false; player.schedule(); player.go(player.index + 1); });
+  $("v-play").addEventListener("click", () => {
+    player.playing = !player.playing;
+    if (player.playing && player.index >= player.frames.length - 1 && !player.streaming) player.go(0);
+    player.updateControls();
+    player.schedule();
+  });
+
+  function setCollapsed(collapsed) {
+    document.body.classList.toggle("panel-collapsed", collapsed);
+    $("v-collapse").textContent = collapsed ? "Show" : "Hide";
+    $("v-collapse").setAttribute("aria-expanded", String(!collapsed));
+    store.set(PANEL_KEY, collapsed ? "1" : "");
+  }
+  $("v-collapse").addEventListener("click", () => setCollapsed(!document.body.classList.contains("panel-collapsed")));
+  if (store.get(PANEL_KEY)) setCollapsed(true);
+
+  function render(frame, ctx) {
+    document.querySelectorAll(".pnode").forEach((node) => {
+      const name = node.dataset.node;
+      node.classList.toggle("visited", frame.visited.includes(name));
+      node.classList.toggle("active", name === frame.node);
+      node.classList.toggle("bad", name === frame.node && frame.tone === "bad");
+    });
+    document.querySelectorAll(".pedge").forEach((edge) => {
+      const done = frame.edges.includes(edge.dataset.edge);
+      edge.classList.toggle("done", done);
+      edge.setAttribute("marker-end", done ? "url(#arrow-on)" : "url(#arrow)");
+    });
+
+    const enabled = { embed: true, semantic: true, keyword: frame.mode.hybrid, fused: frame.mode.hybrid, reranked: frame.mode.rerank, top_k: frame.mode.hybrid && !frame.mode.rerank, grade: true };
+    $("chips").replaceChildren(...CHIPS.map(([key, label]) => el("span", {
+      class: "chip" + (enabled[key] ? "" : " off") + (frame.chip === key ? " active" : (frame.chipsDone || []).includes(key) ? " done" : ""),
+      title: enabled[key] ? "" : "Off in this run",
+    }, label)));
+
+    $("legend").replaceChildren(...[...ctx.sources].slice(0, 8).map((source) => el("div", {},
+      el("span", { class: "swatch", style: `background:${colorOf(source)}` }), el("span", { title: source }, shortSource(source)))));
+
+    const explain = $("explain");
+    explain.className = "viz-explain explain" + (frame.tone === "bad" ? " bad" : "");
+    const body = el("p", { class: "explain-body" });
+    body.innerHTML = frame.body; // Frame bodies are built from fixed copy plus escapeHtml'd values.
+    explain.replaceChildren(
+      el("div", { class: "explain-step" }, frame.step),
+      el("div", { class: "explain-title" }, frame.title),
+      body,
+      ...(frame.formula ? [el("div", { class: "formula" }, frame.formula)] : []),
+    );
+
+    renderBoard(frame.columns);
+  }
+
+  function renderBoard(columns) {
+    const board = $("board");
+    // FLIP: note where each chunk was, draw the new frame, then slide chunks from old to new spots.
+    const before = new Map();
+    board.querySelectorAll(".tile").forEach((tile) => {
+      if (!before.has(tile.dataset.id)) before.set(tile.dataset.id, tile.getBoundingClientRect());
+    });
+
+    if (!columns.length) {
+      board.replaceChildren(el("p", { class: "board-empty" }, "No chunks at this step."));
+      return;
+    }
+    board.replaceChildren(...columns.map((column) => el("div", { class: "column" },
+      el("h3", {}, el("span", {}, column.title), el("span", {}, `${column.items.length} · ${column.unit}`)),
+      el("ol", {}, column.items.map((item, index) => el("li", {
+        class: "tile" + (item.state ? " " + item.state : ""),
+        style: `--stripe:${colorOf(item.source)}`,
+        dataset: { id: item.id },
+        title: item.text,
+      },
+        el("span", { class: "rank" }, index + 1),
+        el("span", { class: "src" }, `${shortSource(item.source)} · #${item.chunk_index}`),
+        el("span", { class: "score" }, formatScore(item.score, column.unit)),
+        el("span", { class: "text" }, item.text),
+        item.tags && item.tags.length ? el("span", { class: "tags" }, item.tags.map(([kind, label]) => el("span", { class: `tag ${kind}` }, label))) : null,
+      ))),
+    )));
+
+    if (reduceMotion) return;
+    const seen = new Set();
+    board.querySelectorAll(".tile").forEach((tile) => {
+      const id = tile.dataset.id;
+      const old = before.get(id);
+      const first = !seen.has(id);
+      seen.add(id);
+      if (old && first) {
+        const now = tile.getBoundingClientRect();
+        const dx = old.left - now.left;
+        const dy = old.top - now.top;
+        if (dx || dy) tile.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: "none" }], { duration: 650, easing: "cubic-bezier(.2,.7,.2,1)" });
+      } else {
+        tile.animate([{ opacity: 0, transform: "scale(.96)" }, { opacity: 1, transform: "none" }], { duration: 350, easing: "ease-out" });
+      }
+    });
+  }
+
+  start();
+})();
+</script>
+</body>
+</html>

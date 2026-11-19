@@ -1,0 +1,46 @@
+{
+  "cases": [
+    {
+      "question": "Which is cheaper, the Nike Pegasus 41 or the Asics Novablast 5?",
+      "expected": "The Nike Pegasus 41 is slightly cheaper at $145, compared to $150 for the Asics Novablast 5.",
+      "expected_found": true,
+      "must_contain": ["145", "150"]
+    },
+    {
+      "question": "What do reviewers say about ASICS durability compared to Nike?",
+      "expected": "ASICS is generally more durable at 500-700 miles, while Nike is generally lower at 300-500 miles.",
+      "expected_found": true,
+      "must_contain": ["500", "300"]
+    },
+    {
+      "question": "Should I buy a bigger size in ASICS than in Nike?",
+      "expected": "Yes. ASICS fit smaller than Nike, so go half a size up from your Nike size.",
+      "expected_found": true,
+      "must_contain": ["half"]
+    },
+    {
+      "question": "What is the capital of France?",
+      "expected": "Not in the corpus. The service must not answer this.",
+      "expected_found": false,
+      "must_contain": []
+    },
+    {
+      "question": "When were ASICS and Nike founded?",
+      "expected": "ASICS was founded in 1949 and Nike was founded in 1964.",
+      "expected_found": true,
+      "must_contain": ["1949", "1964"]
+    },
+    {
+      "question": "How do Asics fit compared to New Balance?",
+      "expected": "New Balance has a wider toe box, so Asics feel more snug in comparison.",
+      "expected_found": true,
+      "must_contain": ["New Balance"]
+    },
+    {
+      "question": "What is Nike's stock price today?",
+      "expected": "Not in the corpus. The service must not answer this.",
+      "expected_found": false,
+      "must_contain": []
+    }
+  ]
+}

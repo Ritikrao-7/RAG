@@ -1,0 +1,14 @@
+{
+  "documents": [
+    {
+      "text": "The Nike Pegasus costs $145. It is strong. It is good for the gym.",
+      "source": "nike-note",
+      "brand": "Nike"
+    },
+    {
+      "text": "The Asics Novablast costs $150. It is soft. It is good for long runs.",
+      "source": "asics-note",
+      "brand": "ASICS"
+    }
+  ]
+}

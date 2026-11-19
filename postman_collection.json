@@ -1,0 +1,196 @@
+{
+  "info": {
+    "name": "Brand Q&A Agent",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Requests for the walkthrough. For the full corpus, paste data/samples/ingest_text.json (or ingest_urls.json) into the Ingest body."
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8000"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "health"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Ingest (acme)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/tenants/acme/ingest",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "tenants",
+            "acme",
+            "ingest"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"documents\": [\n    {\n      \"url\": \"https://costbench.com/compare/asana-vs-trello\",\n      \"brand\": \"Asana, Trello\"\n    },\n    {\n      \"text\": \"Notion vs Linear in 2026: Which Tool Powers Your Productivity?\\nChoosing the right tool for project management isn\\u2019t just about features\\u2014it\\u2019s about how your team works. In this article, we break down Notion vs Linear by their strengths, weaknesses, and real-world use cases, so you can decide which fits your workflow better.\\nTL;DR: Key Differences\\n| Feature | Linear | Notion | \\n|---|---|---|\\n| Best for | Dev teams, Agile workflows | Documentation, knowledge, creative workflows | \\n| Interface | Fast, keyboard-based, minimal UI | Visual, flexible, drag-and-drop | \\n| Time tracking | Via Everhour integration | Via Everhour integration | \\n| Docs & wikis | Basic notes only | Full-blown wiki support | \\n| Budget tracking | \\u274c | \\u274c | \\n| Platform integration | GitHub, Slack, Figma, Zapier | Slack, Google Drive, Zapier | \\n| Custom workflows | Yes (agile-focused) | Yes (database-based, highly customizable) | \\n| Reporting | Sprint progress, issue tracking | Custom views, dashboards | \\n| Offline support | No | Yes | \\nLinear Features & Use Cases\\nLinear is designed for fast, software-centric workflows. Its minimalist approach helps engineering and product teams stay in the zone\\u2014without distractions.\\n\\ud83c\\udf1f Highlights\\n- \\ud83c\\udf00 Sprint planning \\u2013 Built-in tools for agile project cycles\\n- \\ud83d\\udee0\\ufe0f Linear issue tracking \\u2013 Perfect for devs using GitHub or GitLab\\n- \\u2328\\ufe0f Keyboard shortcuts \\u2013 Work faster without the mouse\\n- \\ud83e\\uddfc Clean UX \\u2013 Reduces distraction and cognitive load\\n\\ud83d\\udc65 Ideal for\\n- \\ud83d\\ude80 Fast-moving software teams\\n- \\ud83e\\udde9 Agile sprints and issue resolution\\n- \\ud83d\\udcbb Developers who prefer keyboard-based UX\\n\\u2705 Everhour adds time tracking directly to Linear via Linear time tracking integration. Track hours, stay on budget, and run reports\\u2014without ever leaving your sprint board.\\nNotion Features & Use Cases\\nNotion combines docs, databases, wikis, and task management\\u2014all in one flexible workspace.\\n\\ud83c\\udf1f Highlights\\n- \\ud83d\\udcdd Documentation \\u2013 Store meeting notes, SOPs, and project plans\\n- \\ud83d\\udcca Custom databases \\u2013 Track anything from clients to bugs\\n- \\ud83d\\uddc2\\ufe0f Kanban, table, list views \\u2013 Choose the layout that fits your workflow\\n- \\ud83d\\udd17 Notion integrations \\u2013 Automate and centralize your processes, don\\u2019t forget about the aesthetic Notion templates\\n\\ud83d\\udc65 Ideal for\\n- \\ud83e\\udd1d Cross-functional teams\\n- \\ud83c\\udfa8 Marketing, HR, and creative planning\\n- \\ud83d\\udcda Company wikis and knowledge management\\n\\u2705 Everhour brings real-time time tracking to Notion via its Notion time tracking integration. Log time by task or project, visualize workloads, and automate reports\\u2014all from inside Notion.\\nReddit User Opinions\\n\\ud83e\\uddd1\\ud83d\\udcbb Developers prefer Linear\\nRedditors say Linear\\u2019s dev-focused interface, GitHub integration, and sprint management make it ideal for agile teams. Quote: \\u201cDevelopment work is 100% better in Linear.\\u201d\\nLearn how to use Linear properly for maximum efficiency!\\n\\ud83d\\udc69\\ud83d\\udcbc Marketers love Notion\\nMarketers prefer Notion for planning content, managing campaigns, and storing research. One comment: \\u201cMarketing workflows are easier to express in Notion.\\u201d\\n\\ud83d\\udd17 Combo use cases\\nSeveral teams use both: Notion for ideation, Linear for execution. A popular workflow is writing feature specs in Notion, then linking to actionable tasks in Linear.\\nEverhour: The Best of Both Worlds\\nEverhour supports both Linear and Notion with powerful time tracking features that let you:\\n| Feature | Benefit | \\n|---|---|\\n| Time tracking UI | Start/stop timers directly in each tool | \\n| Budget management | Set limits per project or client | \\n| Payroll & invoicing | Auto-generate based on timesheets | \\n| Reporting | View logged hours by project, user, or tag | \\n\\u201cThe trial and setup of Everhour was by far the easiest of any time tracking software. The interface is minimalist and extremely logical, so there was almost no learning curve for our team.\\u201d [Nikolay, Capterra]\\nWhat Real Teams Are Saying\\n\\u201cEverhour is a well-designed, easy to use, powerful time-tracking tool that has one of the most unique integrations with a number of key Saas productivity tools. It seamlessly flows into the UI of apps like Asana and Notion in ways that enhance the experience for both apps. I don\\u2019t see any other apps in the market doing this as well as Everhour does.\\u201d [DJ C., G2]\\n\\u201cWe use Everhour along linear.app for tracking not only the hours but also our project budgets as an IT consultancy. The various tables, charts and other analytical visuals are making it really easy to track who is working on what.\\u201d [Florian, G2]\\n\\u201cThe reporting feature is so easy to use and can be configured any way we need. It\\u2019s much stronger than other tools we\\u2019ve used in the past. It also integrates so well with our project management software.\\u201d [G2]\\nVerdict: Which Should You Use?\\n| Use case | Choose this tool | \\n|---|---|\\n| Agile development team | Linear | \\n| Creative marketing or HR workflows | Notion | \\n| Need both planning and tracking | Use both + Everhour | \\n| Must create client reports | Everhour + either tool | \\nIf you\\u2019re looking to enhance your time tracking (for example, Linear time tracking) and Linear project management, Everhour is a time tracker that offers seamless integration with both tools. It helps streamline workflows and improve team productivity.\\nCheck out our articles breaking down Linear vs Jira, Linear vs Asana, Notion vs Monday, Coda vs Notion, Notion vs Evernote, Wrike vs Notion, Notion vs OneNote, Confluence vs Notion, and Basecamp vs Notion, with all tools reviewed thoroughly!\\nLearn more on what is Linear app in our thorough review!\\n\",\n      \"source\": \"https://everhour.com/blog/notion-vs-linear/\",\n      \"brand\": \"Notion, Linear\"\n    }\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Ask - normal question (acme)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/tenants/acme/ask",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "tenants",
+            "acme",
+            "ask"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"question\": \"What do reviewers say about Asana's pricing compared to Trello?\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Ask - off-topic question (acme)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/tenants/acme/ask",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "tenants",
+            "acme",
+            "ask"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"question\": \"What is the capital of France?\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Ask - different tenant (globex)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/tenants/globex/ask",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "tenants",
+            "globex",
+            "ask"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"question\": \"What do reviewers say about Asana's pricing compared to Trello?\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Ingest - unreachable URL (error)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/tenants/acme/ingest",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "tenants",
+            "acme",
+            "ingest"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"documents\": [\n    {\n      \"url\": \"https://this-domain-does-not-exist.invalid/review\",\n      \"brand\": \"Asana\"\n    }\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

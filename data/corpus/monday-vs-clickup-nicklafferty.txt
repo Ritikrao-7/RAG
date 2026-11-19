@@ -1,0 +1,135 @@
+monday.com and ClickUp are two leading project management tools in a sea of other solutions all promising to supercharge your productivity and streamline your business processes.
+So, how do you decide between them?
+While they have some overlapping features, you should consider some key differences before selecting either of these platforms for your business.
+After all, adding a project management tool to your team is a long-term commitment.
+Once you start setting up projects, tasks, and due dates, you’re creating a sunk cost should you ever move to a different tool.
+This guide runs through both monday.com and ClickUp’s pricing, features and explores how they’ve adopted AI technology to make their software even more appealing to users.
+Why trust my opinion on monday.com vs. Clickup?
+There are a gazillion software comparison websites and articles, so why listen to my take?
+First, I don’t work for monday.com or ClickUp, so I’m not biased towards either platform, although I do earn affiliate income from links to each platform in this post.
+I also have tons of knowledge about the SaaS industry, having previously led growth marketing at Loom, Magical, and Mailgun—feel free to look me up on LinkedIn if you’d like to learn more about my professional career.
+Currently, I’m building a solo business as a growth advisor for startups _and _run the Template Titans podcast, where I interview successful Notion template creators.
+Earlier this year, my wife and I used AI to write a children’s book called Winnie in the Window so I’ve been keeping a keen eye on how SaaS companies like monday.com and ClickUp have incorporated artificial intelligence technology into their existing platforms.
+What is monday.com?
+monday.com is a software company (originally named dapulse) with 1,500 employees supporting 186k customers from its HQ in Tel Aviv, Israel.
+Founded in 2012, the company IPO’d in June 2021, with its stock debuting at $175/share. As of September 2023 the stock is now priced at $158/share.
+monday.com offers the Work OS, a no-code work management platform that enables teams and organizations to build custom, automated workflows to get more done.
+With a user-friendly interface and versatile features, it has gained popularity among businesses of all sizes and industries.
+Main features of monday.com
+So, what can you expect when you commit to monday.com? Here are some of its main features:
+Standalone products
+While the monday.com Work OS allows you to build any tool you need to suit your workflow, it offers some ready-made solutions for specific use cases.
+For example, monday sales CRM enables sales and marketing professionals to map out their entire sales funnel and store crucial customer relationship information.
+Similarly, monday work management is a great fit for organizations that need to orchestrate projects, internal processes, and communication from a central location.
+Dashboard
+The dashboard provides an at-a-glance overview of the data you need without any extra digging around on your part.
+Configure it using drag-and-drop widgets related to budgeting, goals, schedules, resources, and more.
+Within the individual boards, you can also use 15+ views, such as Gantt charts, Kanban views, Calendars, etc., according to your preferences.
+Collaboration
+While you could use monday.com as a solopreneur, it’s a great tool if you need to communicate across your team or multiple departments.
+As well as adding notes directly to your boards, you can integrate with 200+ tools like Slack, Gmail, or Microsoft Teams where your teams might already be chatting.
+Sync it all up in seconds, with no coding required, and you’ll never miss a conversation, alert, or team update.
+Automation
+monday.com helps its users save time by offering powerful automations made up of triggers, conditions, and actions. For example, you might set up a task alert as follows:
+- Trigger: If a task’s due date is 1 week from now
+- Condition: If it assigned to a specific user
+- Action: Send a notification to the task owner to remind them of the deadline
+monday.com pricing
+monday.com offers annual pricing for a small discount or monthly pricing if you prefer the flexibility of paying as you go.
+Pricing is available based on your team size, with a minimum of 3 seats available, followed by denominations of 5, 10, 15, 20, 25, 30, 40, 50, 100, and 200+ seats.
+This can be frustrating if the budget is tight for your small business, and you must pay for 10 seats when you only require 6, for example. Here’s what you can expect to pay at each level:
+- Free: 14-day trial for $0
+- Basic: from $24 per month, including unlimited free viewers, unlimited items, 5GB file storage, and prioritized customer support. You can also create a dashboard based on 1 board.
+- Standard: from $30 per month, including basic features, timeline & Gantt views, calendar view, guest access, 250 automations/actions per month, 250 integrations/actions per month. You can create a dashboard that combines 5 boards.
+- Pro: from $48 per month, including private boards, chart view, time tracking, formula column, 25,000 automations/actions per month, 25,000 integrations/actions per month. You can create a dashboard that combines 10 boards.
+- Enterprise: Custom pricing is available for pro features, enterprise-scale automations & integrations, multi-level permissions, enterprise-grade security & governance, advanced reporting & analytics, tailored onboarding, and premium support. You can create a dashboard that combines 50 boards to meet your organization’s requirements.
+What is ClickUp?
+ClickUp is a relatively new software company launched in 2017, with its HQ in San Diego. It received its Series C funding in October 2021.
+ClickUp is a workplace productivity tool built to save you time.
+It can manage your projects, tasks, brainstorming, communication, documents, goals, and more.
+Essentially, it’s built as one app to replace them all, so there’s no need to switch from your DMs app to your time tracker tool, to your spreadsheet, and then back again.
+You’ll house all your data safely under one roof to save time, energy, money, you name it.
+Main features of ClickUp
+Here’s what you can expect when you put your eggs in ClickUp’s basket:
+Customizable interface
+As an all-in-one workspace, ClickUp allows you to present your data according to your preferences.
+Apply different views and ClickApps, such as custom fields, priority tasks, sprint-specific folders, and lists, to match your workflows.
+Some users initially find the breadth of options overwhelming, but once you’ve got everything set up, you’ll be amazed at how powerful ClickUp is.
+Whiteboards
+Who said brainstorming can only happen face-to-face?
+ClickUp’s real-time, virtual whiteboard allows teams to bring their best ideas together on a creative canvas.
+Team members can add notes, share suggestions, and plan strategies together, attaching docs, notes, and other links in a single place.
+Screen recording
+When it’s easier to share your screen with a remote team member or record a short message, ClickUp’s screen recorder allows you to capture your entire screen, app window, or browser tab without using a third-party tool.
+It’s also simple to turn your recording into a task and assign it to a teammate or add a description to your vid for extra context.
+It’s a great Loom alternative, too.
+Custom permissions
+Custom permissions are available for Enterprise customers and allow the ClickUp Workspace owner to assign individual permissions to each user role, including guests, members, admins, and custom roles.
+For example, you might allow a specific user to edit or delete statuses or create new spaces in the team’s workspace. This feature is a great way for larger teams to keep tabs on security and drive organizational efficiency.
+ClickUp pricing
+ClickUp offers a free plan and three premium tiers based on your budget, team size, and project requirements.
+Like monday.com’s pricing, you can choose from monthly or annual pricing depending on whether flexibility or affordability is your top priority. But unlike its competitor,
+ClickUp allows you to choose from per-member pricing, meaning you’ll only pay for the seats you require. Here’s what ClickUp will cost you:
+- Free: This plan is ideal for personal or small team use and comes with essential features at no cost.
+- Unlimited: Starting from $7 per member per month, this plan offers unlimited storage, integrations, dashboards, Gantt charts, email capabilities, and more, making it perfect for small teams.
+- Business: Priced at $12 per member per month, this plan is tailored for mid-sized teams. It includes Google SSO, unlimited teams, custom exporting, advanced dashboard features, automation, advanced public sharing, and more.
+- Enterprise: Custom pricing is available upon request for larger teams needing advanced features like white labeling, enterprise API, advanced permissions, single sign-on (SSO), unlimited custom roles, and dedicated customer success manager support.
+How do monday.com vs. ClickUp compare?
+Now that you understand the gist of what monday.com and ClickUp offer, let’s figure out which is the best solution for your business based on price, user reviews, and AI capabilities.
+Pricing and free versions
+While we’ve discussed the variations in monday.com and ClickUp’s pricing structure, there’s also a huge difference in the free version of each.
+monday.com offers a 14-day trial of their platform, where you can explore its various features and quickly decide whether it’s the right fit for your biz. After the two weeks have expired, you’ll need to upgrade to a paid plan or lose access to the tool.
+ClickUp has a more generous approach with its “Free Forever” plan for unlimited team members, 100 MB of storage, and unlimited tasks.
+For this reason, ClickUp is a great fit for smaller teams who want the power of a task and project management tool but don’t have the budget to pay.
+User reviews
+Before investing in any project management tool, it’s interesting to compare how other users have experienced the product.
+Before we begin, a note on these B2B software review websites: I have a healthy distaste for all of them.
+I wouldn’t go as far as to say they’re all pay-to-play, but they appear to favor brands that pay them money over brands that don’t.
+Websites like G2 have built their business around making it attractive and almost necessary for brands to work with them.
+They say the voice of the customer matters. But I’m not sure it’s worth paying $40,000+ thousand/year for, and that’s a reasonable estimate of how much it costs to subscribe to G2 or TrustRadius. I know because I’ve paid for G2 before when I worked in-house at some of these tech companies.
+But here are G2’s overall review scores anyway, so you can be the judge.
+ClickUp and monday.com each receive a healthy 4.7 out of 5 score; there’s nothing to choose between them.
+It’s only when we dig into the specific categories that we see some differences.
+ClickUp scores 8.5 for Ease of Use, 8.9 for Quality of Support, and 8.2 for Ease of Setup, with Managing Director Filip I. describing his use of the platform:
+“It’s the most amazing tool I’ve ever used when it comes to project management, productivity, task management and the like. What I like is that I can find all the functionalities whenever I need them. I’m also very happy that it runs simultaneously on my computer and my phone so when I forget to disable the timer, I can do it on the go. Some really great features are the flexibility of statuses, the automations, the ability to create numerous templates, the data segmentation within spaces, the guest users and the fact that I can bring external users, and share data while keeping the rest of the data secure.”
+monday.com scores higher than ClickUp in each category, receiving 9.0 for Ease of Use, 9.0 for Quality of Support, and 8.7 for Ease of Setup. Strategy Manager Phillip C., explains why monday.com’s project management software has been a hit at Papa John’s.
+“I’ve found monday.com to be the perfect tool for our teams in multiple departments. As word spread, more and more team members have started utilizing it to help them with their project management, process management, workflow management, forms building, and technical issue tracking (all depends on the team). It’s easy enough to use where the legacy (or older, non-computer savvy) folks can easily navigate it but also has various layers to really automate and integrate with various tools to make it as robust as possible. I know our Training, Aggregators, and Communications team love the product for their day to day, and I like it to keep up with various projects to see the progress of each iteration of a phase."
+For comparison, Trustpilot users award monday.com 3.8 out of 5 and ClickUp 3.4 out of 5, while over on TrustRadius, both monday.com and ClickUp receive 8.5 out of 10.
+monday.com AI vs ClickUp AI
+As useful as customer feedback is during the research process, only a few users have mentioned each platform’s AI capabilities in their reviews (at the time of writing.) Here’s how ClickUp and monday.com have adopted AI.
+ClickUp’s AI
+ClickUp’s AI functionality is aimed at specific roles within the working environment.
+Businesses can choose from 100+ templates such as writing blog posts for marketing teams, drafting prospecting emails for sales professionals, or creating sprint retrospective reports for engineering departments, to name a few.
+We’ve all seen the generic text that AI can churn out, but I wanted to see if ClickUp could be more creative this time.
+I asked it to create a video script to promote a new productivity tool.
+ClickUp returned a basic script detailing the opening shot, the narrator’s speech, and stage directions. It was a decent starting point, but I wanted to improve on the first output by including Sharon, a frazzled marketing manager.
+ClickUp did a great job of setting the scene this time, recognizing that this entirely fictional character was _“sitting at her cluttered desk, looking overwhelmed.” The AI tool also included directions to “cut to a close-up shot of Sharon’s tired face.” _Overall, it was a pretty creative and engaging script generated in just a few seconds.
+With a few tweaks and better prompting, it wouldn’t take long to craft a video scene you could use in your own promotions.
+ClickUp AI is priced at $5 per member/mo on all paid plans, although you can try it out for size as part of a limited free trial.
+monday.com’s AI
+monday AI is currently in Beta Testing and hasn’t yet been rolled out in full.
+Once it is available in your workspace, an administrator must approve your account to use it.
+From here, monday AI assistant pops up as a chatbot in the bottom right of your screen, inviting users to ask questions. I decided to test out if it could generate a list of tasks for a kickoff meeting to discuss an end-of-year whitepaper report.
+monday AI assistant quickly returned the suggested steps, which included creating a new board with columns for task names, assignees, due dates, statuses, and notes.
+Finally, it asked me if I would like the AI assistant to create the board for me. This sounded like an amazing workload shortcut, so with the touch of a button, my End of Year WhitePaper Report board was launched, and ready to handle my large-scale, collaborative project.
+monday AI assistant wasn’t able to interact with the board further.
+I asked it to create an extra item for “Interviews” between the Research and Write stages of the project.
+The output explained, _“I’m sorry, but as an AI language model, I don’t have direct access to your monday.com account and therefore can’t modify your boards directly. However, I can guide you through the steps to add a new item to your board.” _
+AI assistant was also unable to answer basic questions about board items.
+For example, I asked it to notify me if any of my planning items were due in the next 24 hours, based on information in the Due Dates column.
+AI assistant explained it couldn’t view account data in real-time, but was able to show me how to check the due dates column myself.
+Overall, I was impressed monday AI assistant could launch a new board and kickstart my project.
+But there’s a potential for it to shave heaps more time off routine processes.
+As it’s still in Beta, it’s fair to assume that the functionality will improve over time. On this note, the company is keen to hear suggestions from the monday.com user community about what they’d like to see from the AI tool.
+monday.com vs. ClickUp: which is best for your business?
+So, there we have it.
+A full rundown of monday.com and ClickUp, so you can visualize how either could fit into your organization and maximize your workflows.
+Which is the best fit for your business?
+It depends.
+Based on its pricing model alone, ClickUp could be a better choice, as it has a generous free plan, and you don’t have to pay for a minimum number of seats on the paid plans.
+It’s miles more affordable than monday.com.
+But monday.com fares better in terms of G2 user review scores, especially in the Ease of Use category.
+There’s an undeniable learning curve associated with ClickUp, whose customization capabilities can overwhelm new users. If you’re looking to get up and running in just a few clicks, then monday.com could be the better option.
+In terms of AI, ClickUp’s offering is robust and ready to rock, while monday AI Assistant is still somewhat waiting in the wings.
+If neither of these platforms is for you, I’ve written comprehensive guides on both monday.com alternatives and ClickUp alternatives.
+I’ve also compared monday.com and ClickUp on this list of seven Notion alternatives. Feel free to read around and seek the best solution for your business.
